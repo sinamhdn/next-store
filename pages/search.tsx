@@ -20,6 +20,7 @@ import axios from "axios";
 import { Rating, Pagination } from "@mui/material";
 import type { SelectChangeEvent } from "@mui/material";
 import type { GetServerSideProps } from "next";
+import type { SortOrder } from "mongoose";
 
 const PAGE_SIZE = 3;
 
@@ -112,11 +113,16 @@ export default function Search(props: ISearchProp) {
     });
   };
 
+  const { state, dispatch } = useContext(Store);
+
   const categoryHandler = (e: SelectChangeEvent<string>) => {
     filterSearch({ category: e.target.value });
   };
 
-  const pageHandler = (e: SelectChangeEvent<string>, page: string | number) => {
+  const pageHandler = (
+    e: React.ChangeEvent<unknown>,
+    page: string | number
+  ) => {
     filterSearch({ page });
   };
 
@@ -136,7 +142,6 @@ export default function Search(props: ISearchProp) {
     filterSearch({ rating: e.target.value });
   };
 
-  const { state, dispatch } = useContext(Store);
   const addToCartHandler = async (product: TProduct) => {
     const existItem = state.cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -148,6 +153,7 @@ export default function Search(props: ISearchProp) {
     dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
     router.push("/cart");
   };
+
   return (
     <Layout title="Search">
       <Grid className="mt1" container spacing={1}>
@@ -274,7 +280,7 @@ export default function Search(props: ISearchProp) {
           </Grid>
           <Pagination
             className="mt1"
-            defaultPage={parseInt((query as any).page || "1")}
+            defaultPage={parseInt((router.query.page as string) || "1")}
             count={Number(pages)}
             onChange={pageHandler}
           ></Pagination>
@@ -288,8 +294,8 @@ export const getServerSideProps: GetServerSideProps = async function ({
   query,
 }) {
   await db.connect();
-  const pageSize = query.pageSize || PAGE_SIZE;
-  const page = query.page || 1;
+  const pageSize: number = Number(query.pageSize || PAGE_SIZE);
+  const page: number = Number(query.page || 1);
   const category = query.category || "";
   const brand = query.brand || "";
   const price = query.price || "";
@@ -321,13 +327,18 @@ export const getServerSideProps: GetServerSideProps = async function ({
     price && price !== "all"
       ? {
           price: {
-            $gte: Number(price.split("-")[0]),
-            $lte: Number(price.split("-")[1]),
+            $gte: Number((price as string).split("-")[0]),
+            $lte: Number((price as string).split("-")[1]),
           },
         }
       : {};
 
-  const order =
+  const order:
+    | { featured: SortOrder }
+    | { price: SortOrder }
+    | { rating: SortOrder }
+    | { createdAt: SortOrder }
+    | { _id: SortOrder } =
     sort === "featured"
       ? { featured: -1 }
       : sort === "lowest"
