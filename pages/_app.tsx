@@ -1,7 +1,6 @@
 import { AppProps } from "next/app";
 import { useEffect } from "react";
 import { CacheProvider, EmotionCache } from "@emotion/react";
-import createEmotionCache from "../utils/createEmotionCache";
 // makes it easier to work with paypal inside react
 import {
   PayPalScriptProvider,
@@ -9,6 +8,7 @@ import {
 } from "@paypal/react-paypal-js";
 // react notification liberary
 import { SnackbarProvider } from "notistack";
+import createEmotionCache from "../utils/createEmotionCache";
 import { StoreProvider } from "../components/Store";
 import Theme from "../components/Theme";
 import "../styles/globals.scss";
@@ -35,11 +35,11 @@ const initialOptions: PayPalScriptProviderOptions = {
   intent: "capture",
 };
 
-function MyApp({
+const MyApp = ({
   Component,
   emotionCache = clientSideEmotionCache,
   pageProps,
-}: MyAppProps) {
+}: MyAppProps) => {
   useEffect(() => {
     // jssStyles are used to prevent the FOUC where a web page appears briefly with the browser's default styles prior to loading an external stylesheet and since Next.js is rendered in the server side jssStyles is not required and hence you remove it
     const jssStyles = document.querySelector("#jss-server-side");
@@ -60,6 +60,6 @@ function MyApp({
       </StoreProvider>
     </SnackbarProvider>
   );
-}
+};
 
 export default MyApp;

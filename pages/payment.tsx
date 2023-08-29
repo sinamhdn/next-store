@@ -1,9 +1,9 @@
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
 import React, { useContext, useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import Cookies from "js-cookie";
-import { useRouter } from "next/router";
-import { Store } from "../components/Store";
-import Layout from "../components/Layout";
+import { useSnackbar } from "notistack";
 import CheckoutWizard from "../components/CheckoutWizard";
 import {
   Button,
@@ -15,9 +15,10 @@ import {
   RadioGroup,
   Typography,
 } from "@mui/material";
-import { useSnackbar } from "notistack";
+import Layout from "../components/Layout";
+import { Store } from "../components/Store";
 
-export default function Payment() {
+const Payment: NextPage = () => {
   const { enqueueSnackbar, closeSnackbar } = useSnackbar();
   const router = useRouter();
   const [paymentMethod, setPaymentMethod] = useState("");
@@ -25,13 +26,16 @@ export default function Payment() {
   const {
     cart: { shippingAddress },
   } = state;
+
   useEffect(() => {
+    const redirectShipping = () => router.push("/shipping");
     if (!shippingAddress.address) {
-      router.push("/shipping");
+      redirectShipping();
     } else {
       setPaymentMethod(Cookies.get("paymentMethod") || "");
     }
   }, [router, shippingAddress]);
+
   const submitHandler = (e: FormEvent<HTMLFormElement>) => {
     closeSnackbar();
     e.preventDefault();
@@ -43,6 +47,7 @@ export default function Payment() {
       router.push("/placeorder");
     }
   };
+
   return (
     <Layout title="Payment Method">
       <CheckoutWizard activeStep={2}></CheckoutWizard>
@@ -96,4 +101,6 @@ export default function Payment() {
       </form>
     </Layout>
   );
-}
+};
+
+export default Payment;

@@ -1,9 +1,19 @@
-import React, { useContext, useEffect, useReducer } from 'react';
-import dynamic from 'next/dynamic';
-import Layout from '../../components/Layout';
-import { Store } from '../../utils/Store';
-import NextLink from 'next/link';
-import Image from 'next/image';
+import Image from "next/image";
+import NextLink from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import type { NextPage, GetStaticProps } from "next";
+import React, { useContext, useEffect, useReducer } from "react";
+import { PayPalButtons, usePayPalScriptReducer } from "@paypal/react-paypal-js";
+import { SCRIPT_LOADING_STATE } from "@paypal/react-paypal-js/dist/types/types/enums";
+import type {
+  CreateOrderData,
+  CreateOrderActions,
+  OnApproveData,
+  OnApproveActions,
+} from "@paypal/paypal-js";
+import axios from "axios";
+import { useSnackbar } from "notistack";
 import {
   Grid,
   TableContainer,
@@ -19,64 +29,131 @@ import {
   Card,
   List,
   ListItem,
-} from '@material-ui/core';
-import axios from 'axios';
-import { useRouter } from 'next/router';
-import useStyles from '../../utils/styles';
-import { useSnackbar } from 'notistack';
-import { getError } from '../../utils/error';
-import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js';
+} from "@mui/material";
+import { getError } from "../../utils/error";
+import Layout from "../../components/Layout";
+import { Store } from "../../components/Store";
 
-function reducer(state, action) {
+interface Props {
+  params: { id: string | number };
+}
+
+interface IOrder {
+  _id?: string;
+  user?: number;
+  orderItems?: {
+    _id: string;
+    name: string;
+    quantity?: number;
+    image: string;
+    price?: number;
+    slug?: string;
+  }[];
+  shippingAddress?: {
+    fullName?: string;
+    address?: string;
+    city?: string;
+    postalCode?: string;
+    country?: string;
+    location?: {
+      lat?: string;
+      lng?: string;
+      address?: string;
+      name?: string;
+      vicinity?: string;
+      googleAddressId?: string;
+    };
+  };
+  paymentMethod?: string;
+  paymentResult?: { id?: string; status?: string; email_address?: string };
+  itemsPrice?: number;
+  shippingPrice?: number;
+  taxPrice?: number;
+  totalPrice?: number;
+  isPaid?: boolean;
+  isDelivered?: boolean;
+  paidAt?: string;
+  deliveredAt?: string;
+  createdAt?: string;
+}
+
+interface IState {
+  loading: boolean;
+  order: IOrder;
+  error: string;
+  successPay?: boolean;
+  loadingDeliver?: boolean;
+  successDeliver?: boolean;
+  loadingPay?: boolean;
+  errorPay?: string;
+  errorDeliver?: string;
+}
+
+interface IAction {
+  type?:
+    | "FETCH_REQUEST"
+    | "FETCH_SUCCESS"
+    | "FETCH_FAIL"
+    | "PAY_REQUEST"
+    | "PAY_SUCCESS"
+    | "PAY_FAIL"
+    | "PAY_RESET"
+    | "DELIVER_REQUEST"
+    | "DELIVER_SUCCESS"
+    | "DELIVER_FAIL"
+    | "DELIVER_RESET";
+  payload?: any;
+}
+
+function reducer(state: IState, action: IAction): IState {
   switch (action.type) {
-    case 'FETCH_REQUEST':
-      return { ...state, loading: true, error: '' };
-    case 'FETCH_SUCCESS':
-      return { ...state, loading: false, order: action.payload, error: '' };
-    case 'FETCH_FAIL':
+    case "FETCH_REQUEST":
+      return { ...state, loading: true, error: "" };
+    case "FETCH_SUCCESS":
+      return { ...state, loading: false, order: action.payload, error: "" };
+    case "FETCH_FAIL":
       return { ...state, loading: false, error: action.payload };
-    case 'PAY_REQUEST':
+    case "PAY_REQUEST":
       return { ...state, loadingPay: true };
-    case 'PAY_SUCCESS':
+    case "PAY_SUCCESS":
       return { ...state, loadingPay: false, successPay: true };
-    case 'PAY_FAIL':
+    case "PAY_FAIL":
       return { ...state, loadingPay: false, errorPay: action.payload };
-    case 'PAY_RESET':
-      return { ...state, loadingPay: false, successPay: false, errorPay: '' };
-    case 'DELIVER_REQUEST':
+    case "PAY_RESET":
+      return { ...state, loadingPay: false, successPay: false, errorPay: "" };
+    case "DELIVER_REQUEST":
       return { ...state, loadingDeliver: true };
-    case 'DELIVER_SUCCESS':
+    case "DELIVER_SUCCESS":
       return { ...state, loadingDeliver: false, successDeliver: true };
-    case 'DELIVER_FAIL':
+    case "DELIVER_FAIL":
       return { ...state, loadingDeliver: false, errorDeliver: action.payload };
-    case 'DELIVER_RESET':
+    case "DELIVER_RESET":
       return {
         ...state,
         loadingDeliver: false,
         successDeliver: false,
-        errorDeliver: '',
+        errorDeliver: "",
       };
     default:
-      state;
+      return state;
   }
 }
 
-function Order({ params }) {
+const Order: NextPage<Props> = ({ params }) => {
   const orderId = params.id;
   const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
-  const classes = useStyles();
   const router = useRouter();
   const { state } = useContext(Store);
   const { userInfo } = state;
-
+  const initialState: IState = {
+    loading: true,
+    order: {},
+    error: "",
+  };
   const [
     { loading, error, order, successPay, loadingDeliver, successDeliver },
     dispatch,
-  ] = useReducer(reducer, {
-    loading: true,
-    order: {},
-    error: '',
-  });
+  ] = useReducer(reducer, initialState);
   const {
     shippingAddress,
     paymentMethod,
@@ -92,18 +169,19 @@ function Order({ params }) {
   } = order;
 
   useEffect(() => {
+    const redirectLogin = () => router.push("/login");
     if (!userInfo) {
-      return router.push('/login');
+      redirectLogin();
     }
     const fetchOrder = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch({ type: "FETCH_REQUEST" });
         const { data } = await axios.get(`/api/orders/${orderId}`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        dispatch({ type: "FETCH_FAIL", payload: getError(err) });
       }
     };
     if (
@@ -114,36 +192,48 @@ function Order({ params }) {
     ) {
       fetchOrder();
       if (successPay) {
-        dispatch({ type: 'PAY_RESET' });
+        dispatch({ type: "PAY_RESET" });
       }
       if (successDeliver) {
-        dispatch({ type: 'DELIVER_RESET' });
+        dispatch({ type: "DELIVER_RESET" });
       }
     } else {
       const loadPaypalScript = async () => {
-        const { data: clientId } = await axios.get('/api/keys/paypal', {
+        const { data: clientId } = await axios.get("/api/keys/paypal", {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
         paypalDispatch({
-          type: 'resetOptions',
+          type: "resetOptions",
           value: {
-            'client-id': clientId,
-            currency: 'USD',
+            clientId: clientId,
+            currency: "USD",
           },
         });
-        paypalDispatch({ type: 'setLoadingStatus', value: 'pending' });
+        paypalDispatch({
+          type: "setLoadingStatus",
+          value: { state: SCRIPT_LOADING_STATE.PENDING, message: "pending" },
+        });
       };
       loadPaypalScript();
     }
-  }, [order, successPay, successDeliver]);
+  }, [
+    order,
+    successPay,
+    successDeliver,
+    orderId,
+    paypalDispatch,
+    router,
+    userInfo,
+  ]);
+
   const { enqueueSnackbar } = useSnackbar();
 
-  function createOrder(data, actions) {
+  function createOrder(data: CreateOrderData, actions: CreateOrderActions) {
     return actions.order
       .create({
         purchase_units: [
           {
-            amount: { value: totalPrice },
+            amount: { value: totalPrice?.toString() ?? "0" },
           },
         ],
       })
@@ -151,33 +241,37 @@ function Order({ params }) {
         return orderID;
       });
   }
-  function onApprove(data, actions) {
-    return actions.order.capture().then(async function (details) {
-      try {
-        dispatch({ type: 'PAY_REQUEST' });
-        const { data } = await axios.put(
-          `/api/orders/${order._id}/pay`,
-          details,
-          {
-            headers: { authorization: `Bearer ${userInfo.token}` },
-          }
-        );
-        dispatch({ type: 'PAY_SUCCESS', payload: data });
-        enqueueSnackbar('Order is paid', { variant: 'success' });
-      } catch (err) {
-        dispatch({ type: 'PAY_FAIL', payload: getError(err) });
-        enqueueSnackbar(getError(err), { variant: 'error' });
-      }
-    });
+
+  function onApprove(data: OnApproveData, actions: OnApproveActions) {
+    if (actions.order) {
+      return actions.order.capture().then(async function (details) {
+        try {
+          dispatch({ type: "PAY_REQUEST" });
+          const { data } = await axios.put(
+            `/api/orders/${order._id}/pay`,
+            details,
+            {
+              headers: { authorization: `Bearer ${userInfo.token}` },
+            }
+          );
+          dispatch({ type: "PAY_SUCCESS", payload: data });
+          enqueueSnackbar("Order is paid", { variant: "success" });
+        } catch (err) {
+          dispatch({ type: "PAY_FAIL", payload: getError(err) });
+          enqueueSnackbar(getError(err), { variant: "error" });
+        }
+      });
+    }
+    return Promise.reject();
   }
 
-  function onError(err) {
-    enqueueSnackbar(getError(err), { variant: 'error' });
+  function onError(err: Record<string, unknown>) {
+    enqueueSnackbar(getError(err), { variant: "error" });
   }
 
   async function deliverOrderHandler() {
     try {
-      dispatch({ type: 'DELIVER_REQUEST' });
+      dispatch({ type: "DELIVER_REQUEST" });
       const { data } = await axios.put(
         `/api/orders/${order._id}/deliver`,
         {},
@@ -185,11 +279,11 @@ function Order({ params }) {
           headers: { authorization: `Bearer ${userInfo.token}` },
         }
       );
-      dispatch({ type: 'DELIVER_SUCCESS', payload: data });
-      enqueueSnackbar('Order is delivered', { variant: 'success' });
+      dispatch({ type: "DELIVER_SUCCESS", payload: data });
+      enqueueSnackbar("Order is delivered", { variant: "success" });
     } catch (err) {
-      dispatch({ type: 'DELIVER_FAIL', payload: getError(err) });
-      enqueueSnackbar(getError(err), { variant: 'error' });
+      dispatch({ type: "DELIVER_FAIL", payload: getError(err) });
+      enqueueSnackbar(getError(err), { variant: "error" });
     }
   }
 
@@ -201,11 +295,11 @@ function Order({ params }) {
       {loading ? (
         <CircularProgress />
       ) : error ? (
-        <Typography className={classes.error}>{error}</Typography>
+        <Typography className="error">{error}</Typography>
       ) : (
         <Grid container spacing={1}>
           <Grid item md={9} xs={12}>
-            <Card className={classes.section}>
+            <Card className="section">
               <List>
                 <ListItem>
                   <Typography component="h2" variant="h2">
@@ -213,11 +307,11 @@ function Order({ params }) {
                   </Typography>
                 </ListItem>
                 <ListItem>
-                  {shippingAddress.fullName}, {shippingAddress.address},{' '}
-                  {shippingAddress.city}, {shippingAddress.postalCode},{' '}
-                  {shippingAddress.country}
+                  {shippingAddress?.fullName}, {shippingAddress?.address},{" "}
+                  {shippingAddress?.city}, {shippingAddress?.postalCode},{" "}
+                  {shippingAddress?.country}
                   &nbsp;
-                  {shippingAddress.location && (
+                  {shippingAddress?.location && (
                     <Link
                       variant="button"
                       target="_new"
@@ -228,14 +322,14 @@ function Order({ params }) {
                   )}
                 </ListItem>
                 <ListItem>
-                  Status:{' '}
+                  Status:{" "}
                   {isDelivered
                     ? `delivered at ${deliveredAt}`
-                    : 'not delivered'}
+                    : "not delivered"}
                 </ListItem>
               </List>
             </Card>
-            <Card className={classes.section}>
+            <Card className="section">
               <List>
                 <ListItem>
                   <Typography component="h2" variant="h2">
@@ -244,11 +338,11 @@ function Order({ params }) {
                 </ListItem>
                 <ListItem>{paymentMethod}</ListItem>
                 <ListItem>
-                  Status: {isPaid ? `paid at ${paidAt}` : 'not paid'}
+                  Status: {isPaid ? `paid at ${paidAt}` : "not paid"}
                 </ListItem>
               </List>
             </Card>
-            <Card className={classes.section}>
+            <Card className="section">
               <List>
                 <ListItem>
                   <Typography component="h2" variant="h2">
@@ -267,7 +361,7 @@ function Order({ params }) {
                         </TableRow>
                       </TableHead>
                       <TableBody>
-                        {orderItems.map((item) => (
+                        {orderItems?.map((item) => (
                           <TableRow key={item._id}>
                             <TableCell>
                               <NextLink href={`/product/${item.slug}`} passHref>
@@ -305,7 +399,7 @@ function Order({ params }) {
             </Card>
           </Grid>
           <Grid item md={3} xs={12}>
-            <Card className={classes.section}>
+            <Card className="section">
               <List>
                 <ListItem>
                   <Typography variant="h2">Order Summary</Typography>
@@ -359,7 +453,7 @@ function Order({ params }) {
                     {isPending ? (
                       <CircularProgress />
                     ) : (
-                      <div className={classes.fullWidth}>
+                      <div className="full-width">
                         <PayPalButtons
                           createOrder={createOrder}
                           onApprove={onApprove}
@@ -389,10 +483,10 @@ function Order({ params }) {
       )}
     </Layout>
   );
-}
+};
 
-export async function getServerSideProps({ params }) {
+export const getServerSideProps: GetStaticProps = async ({ params }) => {
   return { props: { params } };
-}
+};
 
 export default dynamic(() => Promise.resolve(Order), { ssr: false });

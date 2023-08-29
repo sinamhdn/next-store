@@ -1,9 +1,10 @@
-import React, { useContext } from "react";
-import dynamic from "next/dynamic";
-import Layout from "../components/Layout";
-import { Store } from "../components/Store";
-import NextLink from "next/link";
 import Image from "next/image";
+import NextLink from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
+import React, { useContext } from "react";
+import axios from "axios";
 import {
   Grid,
   TableContainer,
@@ -21,16 +22,25 @@ import {
   List,
   ListItem,
 } from "@mui/material";
-import axios from "axios";
-import { useRouter } from "next/router";
+import Layout from "../components/Layout";
+import { Store } from "../components/Store";
 
-function CartScreen() {
+interface IItem {
+  _id?: number;
+  name?: string;
+  slug?: string;
+  image?: string;
+  quantity?: string;
+  countInstock?: number;
+}
+
+const CartScreen: NextPage = () => {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const {
     cart: { cartItems },
   } = state;
-  const updateCartHandler = async (item: { _id: number }, quantity: number) => {
+  const updateCartHandler = async (item: IItem, quantity: number) => {
     const { data } = await axios.get(`/api/products/${item._id}`);
     if (data.countInStock < quantity) {
       window.alert("Sorry. Product is out of stock");
@@ -38,7 +48,7 @@ function CartScreen() {
     }
     dispatch({ type: "CART_ADD_ITEM", payload: { ...item, quantity } });
   };
-  const removeItemHandler = (item) => {
+  const removeItemHandler = (item: IItem) => {
     dispatch({ type: "CART_REMOVE_ITEM", payload: item });
   };
   const checkoutHandler = () => {
@@ -107,7 +117,7 @@ function CartScreen() {
                           ))}
                         </Select>
                       </TableCell>
-                      <TableCell align="right">${item.price}</TableCell>
+                      <TableCell align="right">{item.price}</TableCell>
                       <TableCell align="right">
                         <Button
                           variant="contained"
@@ -150,6 +160,6 @@ function CartScreen() {
       )}
     </Layout>
   );
-}
+};
 
 export default dynamic(() => Promise.resolve(CartScreen), { ssr: false });

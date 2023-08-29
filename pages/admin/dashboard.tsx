@@ -1,105 +1,122 @@
-import axios from 'axios';
-import dynamic from 'next/dynamic';
-import { useRouter } from 'next/router';
-import NextLink from 'next/link';
-import React, { useEffect, useContext, useReducer } from 'react';
+import NextLink from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import React, { useEffect, useContext, useReducer } from "react";
+import axios from "axios";
+import { Bar } from "react-chartjs-2";
 import {
   CircularProgress,
   Grid,
   List,
   ListItem,
+  ListItemButton,
   Typography,
   Card,
   Button,
   ListItemText,
   CardContent,
   CardActions,
-} from '@material-ui/core';
-import { Bar } from 'react-chartjs-2';
-import { getError } from '../../utils/error';
-import { Store } from '../../utils/Store';
-import Layout from '../../components/Layout';
-import useStyles from '../../utils/styles';
+} from "@mui/material";
+import { getError } from "../../utils/error";
+import { Store } from "../../components/Store";
+import Layout from "../../components/Layout";
 
-function reducer(state, action) {
+interface IState {
+  loading: boolean;
+  error: string;
+  summary: {
+    ordersPrice: number;
+    ordersCount: number;
+    productsCount: number;
+    usersCount: number;
+    salesData: any[];
+  };
+}
+
+interface IAction {
+  type: "FETCH_REQUEST" | "FETCH_SUCCESS" | "FETCH_FAIL";
+  payload?: any;
+}
+
+function reducer(state: IState, action: IAction) {
   switch (action.type) {
-    case 'FETCH_REQUEST':
-      return { ...state, loading: true, error: '' };
-    case 'FETCH_SUCCESS':
-      return { ...state, loading: false, summary: action.payload, error: '' };
-    case 'FETCH_FAIL':
+    case "FETCH_REQUEST":
+      return { ...state, loading: true, error: "" };
+    case "FETCH_SUCCESS":
+      return { ...state, loading: false, summary: action.payload, error: "" };
+    case "FETCH_FAIL":
       return { ...state, loading: false, error: action.payload };
     default:
-      state;
+      return state;
   }
 }
 
 function AdminDashboard() {
   const { state } = useContext(Store);
   const router = useRouter();
-  const classes = useStyles();
   const { userInfo } = state;
 
   const [{ loading, error, summary }, dispatch] = useReducer(reducer, {
     loading: true,
     summary: { salesData: [] },
-    error: '',
+    error: "",
   });
 
   useEffect(() => {
+    const redirectLogin = () => router.push("/login");
     if (!userInfo) {
-      router.push('/login');
+      redirectLogin();
     }
     const fetchData = async () => {
       try {
-        dispatch({ type: 'FETCH_REQUEST' });
+        dispatch({ type: "FETCH_REQUEST" });
         const { data } = await axios.get(`/api/admin/summary`, {
           headers: { authorization: `Bearer ${userInfo.token}` },
         });
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
+        dispatch({ type: "FETCH_SUCCESS", payload: data });
       } catch (err) {
-        dispatch({ type: 'FETCH_FAIL', payload: getError(err) });
+        dispatch({ type: "FETCH_FAIL", payload: getError(err) });
       }
     };
     fetchData();
-  }, []);
+  }, [router, userInfo]);
   return (
     <Layout title="Admin Dashboard">
       <Grid container spacing={1}>
         <Grid item md={3} xs={12}>
-          <Card className={classes.section}>
+          <Card className="section">
             <List>
               <NextLink href="/admin/dashboard" passHref>
-                <ListItem selected button component="a">
+                <ListItemButton selected component="a">
                   <ListItemText primary="Admin Dashboard"></ListItemText>
-                </ListItem>
+                </ListItemButton>
               </NextLink>
               <NextLink href="/admin/orders" passHref>
-                <ListItem button component="a">
+                <ListItemButton component="a">
                   <ListItemText primary="Orders"></ListItemText>
-                </ListItem>
+                </ListItemButton>
               </NextLink>
               <NextLink href="/admin/products" passHref>
-                <ListItem button component="a">
+                <ListItemButton component="a">
                   <ListItemText primary="Products"></ListItemText>
-                </ListItem>
+                </ListItemButton>
               </NextLink>
               <NextLink href="/admin/users" passHref>
-                <ListItem button component="a">
+                <ListItemButton component="a">
                   <ListItemText primary="Users"></ListItemText>
-                </ListItem>
+                </ListItemButton>
               </NextLink>
             </List>
           </Card>
         </Grid>
         <Grid item md={9} xs={12}>
-          <Card className={classes.section}>
+          <Card className="section">
             <List>
               <ListItem>
                 {loading ? (
                   <CircularProgress />
                 ) : error ? (
-                  <Typography className={classes.error}>{error}</Typography>
+                  <Typography className="error">{error}</Typography>
                 ) : (
                   <Grid container spacing={5}>
                     <Grid item md={3}>
@@ -181,17 +198,21 @@ function AdminDashboard() {
               <ListItem>
                 <Bar
                   data={{
-                    labels: summary.salesData.map((x) => x._id),
+                    labels: summary.salesData.map(
+                      (x: { _id: string }) => x._id
+                    ),
                     datasets: [
                       {
-                        label: 'Sales',
-                        backgroundColor: 'rgba(162, 222, 208, 1)',
-                        data: summary.salesData.map((x) => x.totalSales),
+                        label: "Sales",
+                        backgroundColor: "rgba(162, 222, 208, 1)",
+                        data: summary.salesData.map(
+                          (x: { totalSales: number }) => x.totalSales
+                        ),
                       },
                     ],
                   }}
                   options={{
-                    legend: { display: true, position: 'right' },
+                    plugins: { legend: { display: true, position: "right" } },
                   }}
                 ></Bar>
               </ListItem>

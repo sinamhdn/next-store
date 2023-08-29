@@ -1,3 +1,12 @@
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import { Url } from "next/dist/shared/lib/router/router";
+import type { NextPage } from "next";
+import React, { useContext, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import axios from "axios";
+import Cookies from "js-cookie";
+import { useSnackbar } from "notistack";
 import {
   List,
   ListItem,
@@ -6,24 +15,16 @@ import {
   Button,
   Link,
 } from "@mui/material";
-import axios from "axios";
-import { useRouter } from "next/router";
-import NextLink from "next/link";
-import React, { useContext, useEffect } from "react";
 import Layout from "../components/Layout";
 import { Store } from "../components/Store";
-import Cookies from "js-cookie";
-import { Controller, useForm } from "react-hook-form";
-import { useSnackbar } from "notistack";
 import { getError } from "../utils/error";
-import { Url } from "next/dist/shared/lib/router/router";
 
 type TSubmitData = {
   email: string;
   password: string;
 };
 
-export default function Login() {
+const Login: NextPage = () => {
   const {
     handleSubmit,
     control,
@@ -35,8 +36,9 @@ export default function Login() {
   const { state, dispatch } = useContext(Store);
   const { userInfo } = state;
   useEffect(() => {
+    const redirectHome = () => router.push("/");
     if (userInfo) {
-      router.push("/");
+      redirectHome();
     }
   }, [router, userInfo]);
 
@@ -134,4 +136,6 @@ export default function Login() {
       </form>
     </Layout>
   );
-}
+};
+
+export default Login;

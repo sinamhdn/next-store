@@ -1,8 +1,12 @@
-import axios from "axios";
+import NextLink from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import NextLink from "next/link";
+import type { NextPage } from "next";
 import React, { useEffect, useContext } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useSnackbar } from "notistack";
+import Cookies from "js-cookie";
+import axios from "axios";
 import {
   Grid,
   List,
@@ -17,11 +21,8 @@ import {
 import { getError } from "../utils/error";
 import { Store } from "../components/Store";
 import Layout from "../components/Layout";
-import { Controller, useForm } from "react-hook-form";
-import { useSnackbar } from "notistack";
-import Cookies from "js-cookie";
 
-function Profile() {
+const Profile: NextPage = () => {
   type FormData = {
     name: string;
     email: string;
@@ -40,12 +41,10 @@ function Profile() {
   const { userInfo } = state;
 
   useEffect(() => {
-    const redirectLoginPage = async function () {
-      if (!userInfo) {
-        return await router.push("/login");
-      }
-    };
-    redirectLoginPage();
+    const redirectLogin = () => router.push("/login");
+    if (!userInfo) {
+      redirectLogin();
+    }
     setValue("name", userInfo.name);
     setValue("email", userInfo.email);
   }, [router, setValue, userInfo]);
@@ -79,6 +78,7 @@ function Profile() {
       enqueueSnackbar(getError(err), { variant: "error" });
     }
   };
+
   return (
     <Layout title="Profile">
       <Grid container spacing={1}>
@@ -244,6 +244,6 @@ function Profile() {
       </Grid>
     </Layout>
   );
-}
+};
 
 export default dynamic(() => Promise.resolve(Profile), { ssr: false });

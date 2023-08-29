@@ -1,3 +1,9 @@
+import type { GetServerSideProps } from "next";
+import React, { useContext } from "react";
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
+import type { SortOrder } from "mongoose";
+import axios from "axios";
 import {
   Box,
   Button,
@@ -7,20 +13,16 @@ import {
   MenuItem,
   Select,
   Typography,
+  Rating,
+  Pagination,
 } from "@mui/material";
 import CancelIcon from "@mui/icons-material/Cancel";
-import { useRouter } from "next/router";
-import React, { useContext } from "react";
-import Layout from "../components/Layout";
+import type { SelectChangeEvent } from "@mui/material";
 import db from "../utils/db";
 import Product from "../models/Product";
-import ProductItem from "../components/ProductItem";
 import { Store } from "../components/Store";
-import axios from "axios";
-import { Rating, Pagination } from "@mui/material";
-import type { SelectChangeEvent } from "@mui/material";
-import type { GetServerSideProps } from "next";
-import type { SortOrder } from "mongoose";
+import Layout from "../components/Layout";
+import ProductItem from "../components/ProductItem";
 
 const PAGE_SIZE = 3;
 
@@ -60,7 +62,7 @@ interface ISearchProp {
   pages: string;
 }
 
-export default function Search(props: ISearchProp) {
+const Search: NextPage<ISearchProp> = (props) => {
   const router = useRouter();
   const {
     query = "all",
@@ -72,17 +74,17 @@ export default function Search(props: ISearchProp) {
   } = router.query;
   const { products, countProducts, categories, brands, pages } = props;
 
-  interface IFilterSearch {
-    page?: number | string;
+  type TFilterSearch = {
+    page?: number;
     category?: string;
     brand?: string;
     sort?: string;
-    min?: number | string;
-    max?: number | string;
+    min?: number;
+    max?: number;
     searchQuery?: string;
-    price?: string;
-    rating?: string;
-  }
+    price?: number;
+    rating?: number;
+  };
 
   const filterSearch = ({
     page,
@@ -94,7 +96,7 @@ export default function Search(props: ISearchProp) {
     searchQuery,
     price,
     rating,
-  }: IFilterSearch) => {
+  }: TFilterSearch) => {
     const path = router.pathname;
     const { query } = router;
     if (page) query.page = String(page);
@@ -102,8 +104,8 @@ export default function Search(props: ISearchProp) {
     if (sort) query.sort = sort;
     if (category) query.category = category;
     if (brand) query.brand = brand;
-    if (price) query.price = price;
-    if (rating) query.rating = rating;
+    if (price) query.price = price.toString();
+    if (rating) query.rating = rating.toString();
     if (min) query.min ? query.min : Number(query.min) === 0 ? 0 : min;
     if (max) query.max ? query.max : Number(query.max) === 0 ? 0 : max;
 
@@ -119,10 +121,7 @@ export default function Search(props: ISearchProp) {
     filterSearch({ category: e.target.value });
   };
 
-  const pageHandler = (
-    e: React.ChangeEvent<unknown>,
-    page: string | number
-  ) => {
+  const pageHandler = (e: React.ChangeEvent<unknown>, page: number) => {
     filterSearch({ page });
   };
 
@@ -135,11 +134,11 @@ export default function Search(props: ISearchProp) {
   };
 
   const priceHandler = (e: SelectChangeEvent<string>) => {
-    filterSearch({ price: e.target.value });
+    filterSearch({ price: Number(e.target.value) });
   };
 
   const ratingHandler = (e: SelectChangeEvent<string>) => {
-    filterSearch({ rating: e.target.value });
+    filterSearch({ rating: Number(e.target.value) });
   };
 
   const addToCartHandler = async (product: TProduct) => {
@@ -288,7 +287,9 @@ export default function Search(props: ISearchProp) {
       </Grid>
     </Layout>
   );
-}
+};
+
+export default Search;
 
 export const getServerSideProps: GetServerSideProps = async function ({
   query,

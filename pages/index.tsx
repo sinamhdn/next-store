@@ -1,31 +1,33 @@
 /* eslint-disable @next/next/no-img-element */
+import type { GetServerSideProps, NextPage } from "next";
 import NextLink from "next/link";
-import type { NextPage } from "next";
-import { Grid, Link, Typography } from "@mui/material";
-import Layout from "../components/Layout";
-import db from "../utils/db";
-import Product from "../models/Product";
-import axios from "axios";
 import { useRouter } from "next/router";
 import { useContext } from "react";
-import { Store } from "../components/Store";
-import ProductItem from "../components/ProductItem";
 import Carousel from "react-material-ui-carousel";
+import axios from "axios";
+import { Grid, Link, Typography } from "@mui/material";
+import Product from "../models/Product";
+import db from "../utils/db";
+import { Store } from "../components/Store";
+import Layout from "../components/Layout";
+import ProductItem from "../components/ProductItem";
 
-type TProduct = {
-  _id: number;
+interface TProduct {
+  _id: string;
   image: string;
   name: string;
   rating: number;
   price: number;
   slug: string;
   featuredImage: string;
-};
+}
 
-const Home = (props: {
+interface IProps {
   topRatedProducts: TProduct[];
   featuredProducts: TProduct[];
-}) => {
+}
+
+const Home: NextPage<IProps> = (props) => {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const { topRatedProducts, featuredProducts } = props;
@@ -76,7 +78,7 @@ const Home = (props: {
 
 export default Home;
 
-export async function getServerSideProps() {
+export const getServerSideProps: GetServerSideProps = async () => {
   await db.connect();
   const featuredProductsDocs = await Product.find(
     { isFeatured: true },
@@ -97,4 +99,4 @@ export async function getServerSideProps() {
       topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj),
     },
   };
-}
+};

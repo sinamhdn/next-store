@@ -7,9 +7,9 @@ import Document, {
   DocumentContext,
 } from "next/document";
 import { AppType } from "next/app";
-import { MyAppProps } from "./_app";
-import createEmotionServer from "@emotion/server/create-instance";
 import React from "react";
+import createEmotionServer from "@emotion/server/create-instance";
+import { MyAppProps } from "./_app";
 import createEmotionCache from "../utils/createEmotionCache";
 // import defaultTheme from "../themes/defaultTheme";
 
@@ -17,7 +17,7 @@ interface MyDocumentProps extends DocumentProps {
   emotionStyleTags: JSX.Element[];
 }
 
-export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
+const MyDocument = ({ emotionStyleTags }: MyDocumentProps) => {
   return (
     <Html lang="en">
       <Head>
@@ -38,7 +38,9 @@ export default function MyDocument({ emotionStyleTags }: MyDocumentProps) {
       </body>
     </Html>
   );
-}
+};
+
+export default MyDocument;
 
 // `getInitialProps` belongs to `_document` (instead of `_app`),
 // it's compatible with static-site generation (SSG).

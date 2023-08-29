@@ -1,30 +1,42 @@
-import { useRouter } from "next/router";
 import dynamic from "next/dynamic";
-import { Store } from "../components/Store";
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
 import React, { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import { useSnackbar } from "notistack";
-import { CircularProgress } from "@mui/material";
 import {
   GoogleMap,
   LoadScript,
   Marker,
   StandaloneSearchBox,
 } from "@react-google-maps/api";
+import { CircularProgress } from "@mui/material";
 import { getError } from "../utils/error";
+import { Store } from "../components/Store";
+
+type Library =
+  | "core"
+  | "maps"
+  | "places"
+  | "geocoding"
+  | "routes"
+  | "marker"
+  | "geometry"
+  | "elevation"
+  | "streetView"
+  | "journeySharing"
+  | "drawing"
+  | "visualization";
 
 const defaultLocation = { lat: 45.516, lng: -73.56 };
-const libs = ["places"];
+const libs: Library[] = ["places"];
 
-function Map() {
+const Map: NextPage = () => {
   const router = useRouter();
   const { enqueueSnackbar } = useSnackbar();
-
   const { state, dispatch } = useContext(Store);
   const { userInfo } = state;
-
   const [googleApiKey, setGoogleApiKey] = useState("");
-
   const [center, setCenter] = useState(defaultLocation);
   const [location, setLocation] = useState(center);
 
@@ -47,7 +59,6 @@ function Map() {
         });
       }
     };
-
     const fetchGoogleApiKey = async () => {
       try {
         const { data } = await axios("/api/keys/google", {
@@ -62,41 +73,43 @@ function Map() {
     fetchGoogleApiKey();
   }, [enqueueSnackbar, userInfo.token]);
 
-  type TMap = {
-    center: {
+  interface TMap extends google.maps.Map {
+    center?: {
       lat: Function;
       lng: Function;
     };
     getPlaces: Function;
-  };
+  }
 
-  const mapRef = useRef<TMap | null>(null);
-  const placeRef = useRef<TMap | null>(null);
-  const markerRef = useRef<TMap | null>(null);
+  const mapRef = useRef<google.maps.Map | null>(null);
+  const placeRef = useRef<
+    google.maps.places.SearchBox | google.maps.Map | null
+  >(null);
+  const markerRef = useRef<google.maps.Map | google.maps.Marker | null>(null);
 
-  const onLoad = (map: TMap) => {
+  const onLoad = (map: google.maps.Map) => {
     mapRef.current = map;
   };
 
   const onIdle = () => {
     setLocation({
-      lat: mapRef.current?.center.lat(),
-      lng: mapRef.current?.center.lng(),
+      lat: (mapRef?.current as TMap)?.center?.lat(),
+      lng: (mapRef?.current as TMap)?.center?.lng(),
     });
   };
 
-  const onLoadPlaces = (place: TMap) => {
+  const onLoadPlaces = (place: google.maps.places.SearchBox) => {
     placeRef.current = place;
   };
 
   const onPlacesChanged = () => {
-    const place = placeRef.current?.getPlaces()[0].geometry.location;
+    const place = (placeRef.current as TMap)?.getPlaces()[0].geometry.location;
     setCenter({ lat: place.lat(), lng: place.lng() });
     setLocation({ lat: place.lat(), lng: place.lng() });
   };
 
   const onConfirm = () => {
-    const places = placeRef.current?.getPlaces();
+    const places = (placeRef.current as TMap)?.getPlaces();
     if (places && places.length === 1) {
       dispatch({
         type: "SAVE_SHIPPING_ADDRESS_MAP_LOCATION",
@@ -116,7 +129,7 @@ function Map() {
     }
   };
 
-  const onMarkerLoad = (marker: TMap) => {
+  const onMarkerLoad = (marker: google.maps.Marker) => {
     markerRef.current = marker;
   };
 
@@ -149,6 +162,6 @@ function Map() {
   ) : (
     <CircularProgress />
   );
-}
+};
 
 export default dynamic(() => Promise.resolve(Map), { ssr: false });

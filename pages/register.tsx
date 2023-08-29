@@ -1,3 +1,12 @@
+import NextLink from "next/link";
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
+import React, { useContext, useEffect } from "react";
+import { Controller, useForm } from "react-hook-form";
+import { useSnackbar } from "notistack";
+import Cookies from "js-cookie";
+import axios from "axios";
+import { Url } from "url";
 import {
   List,
   ListItem,
@@ -6,19 +15,11 @@ import {
   Button,
   Link,
 } from "@mui/material";
-import axios from "axios";
-import { useRouter } from "next/router";
-import NextLink from "next/link";
-import React, { useContext, useEffect } from "react";
-import Layout from "../components/Layout";
-import { Store } from "../components/Store";
-import Cookies from "js-cookie";
-import { Controller, useForm } from "react-hook-form";
-import { useSnackbar } from "notistack";
 import { getError } from "../utils/error";
-import { Url } from "url";
+import { Store } from "../components/Store";
+import Layout from "../components/Layout";
 
-export default function Register() {
+const Register: NextPage = () => {
   type FormData = {
     name: string;
     email: string;
@@ -35,9 +36,11 @@ export default function Register() {
   const { redirect } = router.query;
   const { state, dispatch } = useContext(Store);
   const { userInfo } = state;
+
   useEffect(() => {
+    const redirectHome = () => router.push("/");
     if (userInfo) {
-      router.push("/");
+      redirectHome();
     }
   }, [router, userInfo]);
 
@@ -65,6 +68,7 @@ export default function Register() {
       enqueueSnackbar(getError(err), { variant: "error" });
     }
   };
+
   return (
     <Layout title="Register">
       <form onSubmit={handleSubmit(submitHandler)} className="form">
@@ -203,4 +207,6 @@ export default function Register() {
       </form>
     </Layout>
   );
-}
+};
+
+export default Register;

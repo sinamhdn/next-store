@@ -1,13 +1,14 @@
-import { List, ListItem, Typography, TextField, Button } from "@mui/material";
-import { useRouter } from "next/router";
 import React, { useContext, useEffect } from "react";
-import Layout from "../components/Layout";
-import { Store } from "../components/Store";
-import Cookies from "js-cookie";
+import type { NextPage } from "next";
+import { useRouter } from "next/router";
 import { Controller, useForm } from "react-hook-form";
+import Cookies from "js-cookie";
+import { List, ListItem, Typography, TextField, Button } from "@mui/material";
+import { Store } from "../components/Store";
+import Layout from "../components/Layout";
 import CheckoutWizard from "../components/CheckoutWizard";
 
-export default function Shipping() {
+const Shipping: NextPage = () => {
   const {
     handleSubmit,
     control,
@@ -23,8 +24,9 @@ export default function Shipping() {
   } = state;
   const { location } = shippingAddress;
   useEffect(() => {
+    const redirectLogin = () => router.push("/login?redirect=/shipping");
     if (!userInfo) {
-      router.push("/login?redirect=/shipping");
+      redirectLogin();
     }
     setValue("fullName", shippingAddress.fullName);
     setValue("address", shippingAddress.address);
@@ -42,14 +44,14 @@ export default function Shipping() {
     userInfo,
   ]);
 
-  interface ISubmitHandler {
+  type TAddress = {
     fullName?: string;
     address?: string;
     city?: string;
     postalCode?: string | number;
     country?: string;
     location?: string;
-  }
+  };
 
   const submitHandler = ({
     fullName,
@@ -57,12 +59,12 @@ export default function Shipping() {
     city,
     postalCode,
     country,
-  }: ISubmitHandler) => {
+  }: TAddress) => {
     dispatch({
       type: "SAVE_SHIPPING_ADDRESS",
       payload: { fullName, address, city, postalCode, country, location },
     });
-    const cookieData: ISubmitHandler = {
+    const cookieData: TAddress = {
       fullName,
       address,
       city,
@@ -70,7 +72,7 @@ export default function Shipping() {
       country,
       location,
     };
-    Cookies.set("shippingAddress", cookieData as string);
+    Cookies.set("shippingAddress", JSON.stringify(cookieData));
     router.push("/payment");
   };
 
@@ -84,7 +86,7 @@ export default function Shipping() {
       type: "SAVE_SHIPPING_ADDRESS",
       payload: { fullName, address, city, postalCode, country },
     });
-    const cookieData: ISubmitHandler = {
+    const cookieData: TAddress = {
       fullName,
       address,
       city,
@@ -92,9 +94,10 @@ export default function Shipping() {
       country,
       location,
     };
-    Cookies.set("shippingAddress", cookieData as string);
+    Cookies.set("shippingAddress", JSON.stringify(cookieData));
     router.push("/map");
   };
+
   return (
     <Layout title="Shipping Address">
       <CheckoutWizard activeStep={1} />
@@ -264,4 +267,6 @@ export default function Shipping() {
       </form>
     </Layout>
   );
-}
+};
+
+export default Shipping;

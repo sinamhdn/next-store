@@ -1,8 +1,9 @@
-import axios from "axios";
+import NextLink from "next/link";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/router";
-import NextLink from "next/link";
+import type { NextPage } from "next";
 import React, { useEffect, useContext, useReducer } from "react";
+import axios from "axios";
 import {
   CircularProgress,
   Grid,
@@ -20,9 +21,9 @@ import {
   Button,
   ListItemText,
 } from "@mui/material";
-import { getError } from "../utils/error";
-import { Store } from "../components/Store";
 import Layout from "../components/Layout";
+import { Store } from "../components/Store";
+import { getError } from "../utils/error";
 
 enum EActionType {
   FETCH_REQUEST = "FETCH_REQUEST",
@@ -100,7 +101,7 @@ function reducer(state: TState, action: TAction): TState {
   }
 }
 
-function OrderHistory() {
+const OrderHistory: NextPage = () => {
   const { state } = useContext(Store);
   const router = useRouter();
   const { userInfo } = state;
@@ -117,8 +118,9 @@ function OrderHistory() {
   );
 
   useEffect(() => {
+    const redirectLogin = () => router.push("/login");
     if (!userInfo) {
-      router.push("/login");
+      redirectLogin();
     }
     const fetchOrders = async () => {
       try {
@@ -212,6 +214,6 @@ function OrderHistory() {
       </Grid>
     </Layout>
   );
-}
+};
 
 export default dynamic(() => Promise.resolve(OrderHistory), { ssr: false });

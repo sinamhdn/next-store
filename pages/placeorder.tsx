@@ -1,9 +1,12 @@
-import React, { useContext, useEffect, useState } from "react";
-import dynamic from "next/dynamic";
-import Layout from "../components/Layout";
-import { Store } from "../components/Store";
-import NextLink from "next/link";
 import Image from "next/image";
+import NextLink from "next/link";
+import dynamic from "next/dynamic";
+import { useRouter } from "next/router";
+import type { NextPage } from "next";
+import React, { useContext, useEffect, useState } from "react";
+import Cookies from "js-cookie";
+import { useSnackbar } from "notistack";
+import axios from "axios";
 import {
   Grid,
   TableContainer,
@@ -20,14 +23,12 @@ import {
   List,
   ListItem,
 } from "@mui/material";
-import axios from "axios";
-import { useRouter } from "next/router";
-import CheckoutWizard from "../components/CheckoutWizard";
-import { useSnackbar } from "notistack";
 import { getError } from "../utils/error";
-import Cookies from "js-cookie";
+import { Store } from "../components/Store";
+import Layout from "../components/Layout";
+import CheckoutWizard from "../components/CheckoutWizard";
 
-function PlaceOrder() {
+const PlaceOrder: NextPage = () => {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const {
@@ -43,15 +44,18 @@ function PlaceOrder() {
   const totalPrice = round2(itemsPrice + shippingPrice + taxPrice);
 
   useEffect(() => {
+    const redirectPayment = () => router.push("/payment");
     if (!paymentMethod) {
-      router.push("/payment");
+      redirectPayment();
     }
     if (cartItems.length === 0) {
       router.push("/cart");
     }
   }, [cartItems.length, paymentMethod, router]);
+
   const { closeSnackbar, enqueueSnackbar } = useSnackbar();
   const [loading, setLoading] = useState(false);
+
   const placeOrderHandler = async () => {
     closeSnackbar();
     try {
@@ -82,6 +86,7 @@ function PlaceOrder() {
       enqueueSnackbar(getError(err), { variant: "error" });
     }
   };
+
   return (
     <Layout title="Place Order">
       <CheckoutWizard activeStep={3}></CheckoutWizard>
@@ -148,7 +153,6 @@ function PlaceOrder() {
                               </Link>
                             </NextLink>
                           </TableCell>
-
                           <TableCell>
                             <NextLink href={`/product/${item.slug}`} passHref>
                               <Link>
@@ -242,6 +246,6 @@ function PlaceOrder() {
       </Grid>
     </Layout>
   );
-}
+};
 
 export default dynamic(() => Promise.resolve(PlaceOrder), { ssr: false });
