@@ -313,6 +313,7 @@ const Order: NextPage<Props> = ({ params }) => {
                   &nbsp;
                   {shippingAddress?.location && (
                     <Link
+                      component={NextLink}
                       variant="button"
                       target="_new"
                       href={`https://maps.google.com?q=${shippingAddress.location.lat},${shippingAddress.location.lng}`}
@@ -364,24 +365,28 @@ const Order: NextPage<Props> = ({ params }) => {
                         {orderItems?.map((item) => (
                           <TableRow key={item._id}>
                             <TableCell>
-                              <NextLink href={`/product/${item.slug}`} passHref>
-                                <Link>
-                                  <Image
-                                    src={item.image}
-                                    alt={item.name}
-                                    width={50}
-                                    height={50}
-                                  ></Image>
-                                </Link>
-                              </NextLink>
+                              <Link
+                                component={NextLink}
+                                href={`/product/${item.slug}`}
+                                passHref
+                              >
+                                <Image
+                                  src={item.image}
+                                  alt={item.name}
+                                  width={50}
+                                  height={50}
+                                ></Image>
+                              </Link>
                             </TableCell>
 
                             <TableCell>
-                              <NextLink href={`/product/${item.slug}`} passHref>
-                                <Link>
-                                  <Typography>{item.name}</Typography>
-                                </Link>
-                              </NextLink>
+                              <Link
+                                component={NextLink}
+                                href={`/product/${item.slug}`}
+                                passHref
+                              >
+                                <Typography>{item.name}</Typography>
+                              </Link>
                             </TableCell>
                             <TableCell align="right">
                               <Typography>{item.quantity}</Typography>

@@ -106,11 +106,9 @@ const ProductScreen: NextPage<Props> = (props) => {
   return (
     <Layout title={product.name} description={product.description}>
       <div className="section">
-        <NextLink href="/" passHref>
-          <Link>
-            <Typography>back to products</Typography>
-          </Link>
-        </NextLink>
+        <Link component={NextLink} href="/" passHref>
+          <Typography>back to products</Typography>
+        </Link>
       </div>
       <Grid container spacing={1}>
         <Grid item md={6} xs={12}>
@@ -137,7 +135,7 @@ const ProductScreen: NextPage<Props> = (props) => {
             </ListItem>
             <ListItem>
               <Rating value={product.rating} readOnly></Rating>
-              <Link href="#reviews">
+              <Link component={NextLink} href="#reviews">
                 <Typography>({product.numReviews} reviews)</Typography>
               </Link>
             </ListItem>
@@ -260,7 +258,10 @@ const ProductScreen: NextPage<Props> = (props) => {
           ) : (
             <Typography variant="h2">
               Please{" "}
-              <Link href={`/login?redirect=/product/${product.slug}`}>
+              <Link
+                component={NextLink}
+                href={`/login?redirect=/product/${product.slug}`}
+              >
                 login
               </Link>{" "}
               to write a review

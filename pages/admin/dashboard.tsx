@@ -16,6 +16,7 @@ import {
   ListItemText,
   CardContent,
   CardActions,
+  Link,
 } from "@mui/material";
 import { getError } from "../../utils/error";
 import { Store } from "../../components/Store";
@@ -86,26 +87,26 @@ function AdminDashboard() {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItemButton selected component="a">
+              <Link component={NextLink} href="/admin/dashboard">
+                <ListItemButton selected>
                   <ListItemText primary="Admin Dashboard"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/orders">
+                <ListItemButton>
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/products">
+                <ListItemButton>
                   <ListItemText primary="Products"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/users">
+                <ListItemButton>
                   <ListItemText primary="Users"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>
@@ -128,11 +129,11 @@ function AdminDashboard() {
                           <Typography>Sales</Typography>
                         </CardContent>
                         <CardActions>
-                          <NextLink href="/admin/orders" passHref>
+                          <Link component={NextLink} href="/admin/orders">
                             <Button size="small" color="primary">
                               View sales
                             </Button>
-                          </NextLink>
+                          </Link>
                         </CardActions>
                       </Card>
                     </Grid>
@@ -145,11 +146,11 @@ function AdminDashboard() {
                           <Typography>Orders</Typography>
                         </CardContent>
                         <CardActions>
-                          <NextLink href="/admin/orders" passHref>
+                          <Link component={NextLink} href="/admin/orders">
                             <Button size="small" color="primary">
                               View orders
                             </Button>
-                          </NextLink>
+                          </Link>
                         </CardActions>
                       </Card>
                     </Grid>
@@ -162,11 +163,11 @@ function AdminDashboard() {
                           <Typography>Products</Typography>
                         </CardContent>
                         <CardActions>
-                          <NextLink href="/admin/products" passHref>
+                          <Link component={NextLink} href="/admin/products">
                             <Button size="small" color="primary">
                               View products
                             </Button>
-                          </NextLink>
+                          </Link>
                         </CardActions>
                       </Card>
                     </Grid>
@@ -179,11 +180,11 @@ function AdminDashboard() {
                           <Typography>Users</Typography>
                         </CardContent>
                         <CardActions>
-                          <NextLink href="/admin/users" passHref>
+                          <Link component={NextLink} href="/admin/users">
                             <Button size="small" color="primary">
                               View users
                             </Button>
-                          </NextLink>
+                          </Link>
                         </CardActions>
                       </Card>
                     </Grid>

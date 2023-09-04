@@ -20,6 +20,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Link,
 } from "@mui/material";
 import { Store } from "../../components/Store";
 import Layout from "../../components/Layout";
@@ -133,26 +134,26 @@ function AdminUsers() {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItemButton component="a">
+              <Link component={NextLink} href="/admin/dashboard">
+                <ListItemButton>
                   <ListItemText primary="Admin Dashboard"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/orders">
+                <ListItemButton>
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/products">
+                <ListItemButton>
                   <ListItemText primary="Products"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItemButton selected component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/users">
+                <ListItemButton selected>
                   <ListItemText primary="Users"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>
@@ -191,14 +192,14 @@ function AdminUsers() {
                             <TableCell>{user.email}</TableCell>
                             <TableCell>{user.isAdmin ? "YES" : "NO"}</TableCell>
                             <TableCell>
-                              <NextLink
+                              <Link
+                                component={NextLink}
                                 href={`/admin/user/${user._id}`}
-                                passHref
                               >
                                 <Button size="small" variant="contained">
                                   Edit
                                 </Button>
-                              </NextLink>{" "}
+                              </Link>{" "}
                               <Button
                                 onClick={() => deleteHandler(user._id)}
                                 size="small"

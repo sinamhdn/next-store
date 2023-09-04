@@ -20,6 +20,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Link,
 } from "@mui/material";
 import { Store } from "../../components/Store";
 import Layout from "../../components/Layout";
@@ -166,26 +167,26 @@ function AdminProdcuts() {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItemButton component="a">
+              <Link component={NextLink} href="/admin/dashboard">
+                <ListItemButton>
                   <ListItemText primary="Admin Dashboard"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/orders">
+                <ListItemButton>
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItemButton selected component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/products">
+                <ListItemButton selected>
                   <ListItemText primary="Products"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/users">
+                <ListItemButton>
                   <ListItemText primary="Users"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>
@@ -244,14 +245,15 @@ function AdminProdcuts() {
                             <TableCell>{product.countInStock}</TableCell>
                             <TableCell>{product.rating}</TableCell>
                             <TableCell>
-                              <NextLink
+                              <Link
+                                component={NextLink}
                                 href={`/admin/product/${product._id}`}
                                 passHref
                               >
                                 <Button size="small" variant="contained">
                                   Edit
                                 </Button>
-                              </NextLink>{" "}
+                              </Link>{" "}
                               <Button
                                 onClick={() => deleteHandler(product._id)}
                                 size="small"

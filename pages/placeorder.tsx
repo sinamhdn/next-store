@@ -142,23 +142,25 @@ const PlaceOrder: NextPage = () => {
                       {cartItems.map((item) => (
                         <TableRow key={item._id}>
                           <TableCell>
-                            <NextLink href={`/product/${item.slug}`} passHref>
-                              <Link>
-                                <Image
-                                  src={item.image}
-                                  alt={item.name}
-                                  width={50}
-                                  height={50}
-                                ></Image>
-                              </Link>
-                            </NextLink>
+                            <Link
+                              component={NextLink}
+                              href={`/product/${item.slug}`}
+                            >
+                              <Image
+                                src={item.image}
+                                alt={item.name}
+                                width={50}
+                                height={50}
+                              ></Image>
+                            </Link>
                           </TableCell>
                           <TableCell>
-                            <NextLink href={`/product/${item.slug}`} passHref>
-                              <Link>
-                                <Typography>{item.name}</Typography>
-                              </Link>
-                            </NextLink>
+                            <Link
+                              component={NextLink}
+                              href={`/product/${item.slug}`}
+                            >
+                              <Typography>{item.name}</Typography>
+                            </Link>
                           </TableCell>
                           <TableCell align="right">
                             <Typography>{item.quantity}</Typography>

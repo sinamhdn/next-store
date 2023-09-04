@@ -10,6 +10,7 @@ import {
   Grid,
   List,
   ListItem,
+  ListItemButton,
   Typography,
   Card,
   Button,
@@ -18,6 +19,7 @@ import {
   CircularProgress,
   FormControlLabel,
   Checkbox,
+  Link,
 } from "@mui/material";
 import { getError } from "../../../utils/error";
 import { Store } from "../../../components/Store";
@@ -203,26 +205,26 @@ function ProductEdit({ params }: { params: { id: string } }) {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItem button component="a">
+              <Link component={NextLink} href="/admin/dashboard">
+                <ListItemButton>
                   <ListItemText primary="Admin Dashboard"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItem button component="a">
+                </ListItemButton>
+              </Link>
+              <Link component={NextLink} href="/admin/orders">
+                <ListItemButton>
                   <ListItemText primary="Orders"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItem selected button component="a">
+                </ListItemButton>
+              </Link>
+              <Link component={NextLink} href="/admin/products">
+                <ListItemButton selected>
                   <ListItemText primary="Products"></ListItemText>
-                </ListItem>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItem button component="a">
+                </ListItemButton>
+              </Link>
+              <Link component={NextLink} href="/admin/users">
+                <ListItemButton>
                   <ListItemText primary="Users"></ListItemText>
-                </ListItem>
-              </NextLink>
+                </ListItemButton>
+              </Link>
             </List>
           </Card>
         </Grid>

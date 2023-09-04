@@ -199,9 +199,12 @@ const Register: NextPage = () => {
           </ListItem>
           <ListItem>
             Already have an account? &nbsp;
-            <NextLink href={`/login?redirect=${redirect || "/"}`} passHref>
-              <Link>Login</Link>
-            </NextLink>
+            <Link
+              component={NextLink}
+              href={`/login?redirect=${redirect || "/"}`}
+            >
+              Login
+            </Link>
           </ListItem>
         </List>
       </form>

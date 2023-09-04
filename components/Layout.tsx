@@ -32,7 +32,8 @@ import { useSnackbar } from "notistack";
 import axios from "axios";
 import { useEffect } from "react";
 import { Inter } from "next/font/google";
-
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faBox, faCartShopping } from "@fortawesome/free-solid-svg-icons";
 import { Store } from "../components/Store";
 import { getError } from "../utils/error";
 import type { ReactNode } from "react";
@@ -46,10 +47,12 @@ export const inter = Inter({
 
 export default function Layout({
   title,
+  global_title,
   description,
   children,
 }: {
   title?: string;
+  global_title?: string;
   description?: string;
   children?: ReactNode;
 }) {
@@ -132,7 +135,7 @@ export default function Layout({
         {description && <meta name="description" content={description}></meta>}
       </Head>
 
-      <AppBar position="static" className="navbar">
+      <AppBar position="sticky" className="navbar">
         <Toolbar className="toolbar">
           <Box display="flex" alignItems="center">
             <IconButton
@@ -143,11 +146,29 @@ export default function Layout({
             >
               <MenuIcon className="navbar-button" />
             </IconButton>
-            <NextLink href="/" passHref>
-              <Link>
-                <Typography className="brand">store</Typography>
-              </Link>
-            </NextLink>
+            <Link
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                padding: "0 1rem",
+                textDecoration: "none",
+                "&:hover": {
+                  filter: "brightness(80%)",
+                },
+              }}
+              component={NextLink}
+              href="/"
+            >
+              <FontAwesomeIcon icon={faBox} size="lg" />
+              <Typography
+                sx={{
+                  padding: "0 0.25rem",
+                }}
+                className="brand"
+              >
+                {global_title ? `${global_title} Store` : "Store"}
+              </Typography>
+            </Link>
           </Box>
           <Drawer
             anchor="left"
@@ -169,15 +190,15 @@ export default function Layout({
               </ListItem>
               <Divider light />
               {categories.map((category) => (
-                <NextLink
+                <Link
+                  component={NextLink}
                   key={category}
                   href={`/search?category=${category}`}
-                  passHref
                 >
                   <ListItemButton component="a" onClick={sidebarCloseHandler}>
                     <ListItemText primary={category}></ListItemText>
                   </ListItemButton>
-                </NextLink>
+                </Link>
               ))}
             </List>
           </Drawer>
@@ -203,23 +224,26 @@ export default function Layout({
             <Switch
               checked={darkMode}
               onChange={darkModeChangeHandler}
+              className="mode-checkbox"
             ></Switch>
-            <NextLink href="/cart" passHref>
-              <Link>
-                <Typography component="span">
-                  {cart.cartItems.length > 0 ? (
-                    <Badge
-                      color="secondary"
-                      badgeContent={cart.cartItems.length}
-                    >
-                      Cart
-                    </Badge>
-                  ) : (
-                    "Cart"
-                  )}
-                </Typography>
-              </Link>
-            </NextLink>
+            <Link
+              sx={{
+                textDecoration: "none",
+                "&:hover": { filter: "brightness(75%)" },
+              }}
+              component={NextLink}
+              href="/cart"
+            >
+              <Typography component="span">
+                {cart.cartItems.length > 0 ? (
+                  <Badge color="secondary" badgeContent={cart.cartItems.length}>
+                    <FontAwesomeIcon icon={faCartShopping} size="lg" />
+                  </Badge>
+                ) : (
+                  <FontAwesomeIcon icon={faCartShopping} size="lg" />
+                )}
+              </Typography>
+            </Link>
             {userInfo ? (
               <>
                 <Button
@@ -238,17 +262,20 @@ export default function Layout({
                   onClose={loginMenuCloseHandler}
                 >
                   <MenuItem
+                    sx={{ hover: { filter: "brightness(80%)" } }}
                     onClick={(e) => loginMenuCloseHandler(e, "/profile")}
                   >
                     Profile
                   </MenuItem>
                   <MenuItem
+                    sx={{ hover: { filter: "brightness(80%)" } }}
                     onClick={(e) => loginMenuCloseHandler(e, "/order-history")}
                   >
                     Order Hisotry
                   </MenuItem>
                   {userInfo.isAdmin && (
                     <MenuItem
+                      sx={{ hover: { filter: "brightness(80%)" } }}
                       onClick={(e) =>
                         loginMenuCloseHandler(e, "/admin/dashboard")
                       }
@@ -256,23 +283,35 @@ export default function Layout({
                       Admin Dashboard
                     </MenuItem>
                   )}
-                  <MenuItem onClick={logoutClickHandler}>Logout</MenuItem>
+                  <MenuItem
+                    sx={{ hover: { filter: "brightness(80%)" } }}
+                    onClick={logoutClickHandler}
+                  >
+                    Logout
+                  </MenuItem>
                 </Menu>
               </>
             ) : (
-              <NextLink href="/login" passHref>
-                <Link>
-                  <Typography component="span">Login</Typography>
-                </Link>
-              </NextLink>
+              <Link
+                sx={{ hover: { filter: "brightness(80%)" } }}
+                component={NextLink}
+                href="/login"
+              >
+                <Typography component="span">Login</Typography>
+              </Link>
             )}
           </div>
         </Toolbar>
       </AppBar>
       <Container className="main">{children}</Container>
-      <footer className="footer">
-        <Typography>All rights reserved. Store.</Typography>
-      </footer>
+      <Container
+        className="footer-container"
+        sx={{ marginTop: "15px", marginBottom: "5px" }}
+      >
+        <footer className="footer">
+          <Typography>All rights reserved. Store.</Typography>
+        </footer>
+      </Container>
     </div>
   );
 }

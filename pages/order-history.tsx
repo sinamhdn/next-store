@@ -20,6 +20,7 @@ import {
   TableBody,
   Button,
   ListItemText,
+  Link,
 } from "@mui/material";
 import Layout from "../components/Layout";
 import { Store } from "../components/Store";
@@ -141,16 +142,16 @@ const OrderHistory: NextPage = () => {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/profile" passHref>
+              <Link component={NextLink} href="/profile">
                 <ListItemButton component="a">
                   <ListItemText primary="User Profile"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/order-history" passHref>
+              </Link>
+              <Link component={NextLink} href="/order-history">
                 <ListItemButton selected component="a">
                   <ListItemText primary="Order History"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>
@@ -197,9 +198,12 @@ const OrderHistory: NextPage = () => {
                                 : "not delivered"}
                             </TableCell>
                             <TableCell>
-                              <NextLink href={`/order/${order._id}`} passHref>
+                              <Link
+                                component={NextLink}
+                                href={`/order/${order._id}`}
+                              >
                                 <Button variant="contained">Details</Button>
-                              </NextLink>
+                              </Link>
                             </TableCell>
                           </TableRow>
                         ))}

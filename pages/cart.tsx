@@ -62,9 +62,9 @@ const CartScreen: NextPage = () => {
       {cartItems.length === 0 ? (
         <div>
           Cart is empty.{" "}
-          <NextLink href="/" passHref>
-            <Link>Go shopping</Link>
-          </NextLink>
+          <Link component={NextLink} href="/">
+            Go shopping
+          </Link>
         </div>
       ) : (
         <Grid container spacing={1}>
@@ -84,24 +84,26 @@ const CartScreen: NextPage = () => {
                   {cartItems.map((item) => (
                     <TableRow key={item._id}>
                       <TableCell>
-                        <NextLink href={`/product/${item.slug}`} passHref>
-                          <Link>
-                            <Image
-                              src={item.image}
-                              alt={item.name}
-                              width={50}
-                              height={50}
-                            ></Image>
-                          </Link>
-                        </NextLink>
+                        <Link
+                          component={NextLink}
+                          href={`/product/${item.slug}`}
+                        >
+                          <Image
+                            src={item.image}
+                            alt={item.name}
+                            width={50}
+                            height={50}
+                          ></Image>
+                        </Link>
                       </TableCell>
 
                       <TableCell>
-                        <NextLink href={`/product/${item.slug}`} passHref>
-                          <Link>
-                            <Typography>{item.name}</Typography>
-                          </Link>
-                        </NextLink>
+                        <Link
+                          component={NextLink}
+                          href={`/product/${item.slug}`}
+                        >
+                          <Typography>{item.name}</Typography>
+                        </Link>
                       </TableCell>
                       <TableCell align="right">
                         <Select

@@ -1,6 +1,6 @@
+import { Inter } from "next/font/google";
 import { useMemo, useContext } from "react";
 import type { ReactNode } from "react";
-import { Inter } from "next/font/google";
 import { ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { createTheme } from "@mui/material/styles";
@@ -17,20 +17,28 @@ export const inter = Inter({
 export default function Theme({ children }: { children: ReactNode }) {
   const { state } = useContext(Store);
   const { darkMode } = state;
-
   const theme = useMemo(
     () =>
       createTheme({
         palette: {
           mode: darkMode ? "dark" : "light",
           primary: {
-            main: "#556cd6",
+            main: "#FF5722",
           },
           secondary: {
-            main: "#19857b",
+            main: "#F44336",
           },
           error: {
             main: red.A400,
+          },
+        },
+        components: {
+          MuiCssBaseline: {
+            styleOverrides: `
+              a {
+                text-decoration: none;
+              }
+            `,
           },
         },
         typography: {
@@ -52,7 +60,6 @@ export default function Theme({ children }: { children: ReactNode }) {
 
   return (
     <ThemeProvider theme={theme}>
-      {/* CssBaseline kickstart an elegant, consistent, and simple baseline to build upon. */}
       <CssBaseline />
       {children}
     </ThemeProvider>

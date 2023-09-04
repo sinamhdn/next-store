@@ -17,6 +17,7 @@ import {
   Button,
   ListItemText,
   TextField,
+  Link,
 } from "@mui/material";
 import { getError } from "../utils/error";
 import { Store } from "../components/Store";
@@ -85,16 +86,16 @@ const Profile: NextPage = () => {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/profile" passHref>
+              <Link component={NextLink} href="/profile">
                 <ListItemButton selected component="a">
                   <ListItemText primary="User Profile"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/order-history" passHref>
+              </Link>
+              <Link component={NextLink} href="/order-history">
                 <ListItemButton component="a">
                   <ListItemText primary="Order History"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>

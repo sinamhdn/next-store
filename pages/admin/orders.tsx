@@ -19,6 +19,7 @@ import {
   TableRow,
   TableCell,
   TableBody,
+  Link,
 } from "@mui/material";
 import { getError } from "../../utils/error";
 import { Store } from "../../components/Store";
@@ -98,26 +99,26 @@ function AdminOrders() {
         <Grid item md={3} xs={12}>
           <Card className="section">
             <List>
-              <NextLink href="/admin/dashboard" passHref>
-                <ListItemButton component="a">
+              <Link component={NextLink} href="/admin/dashboard">
+                <ListItemButton>
                   <ListItemText primary="Admin Dashboard"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/orders" passHref>
-                <ListItemButton selected component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/orders">
+                <ListItemButton selected>
                   <ListItemText primary="Orders"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/products" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/products">
+                <ListItemButton>
                   <ListItemText primary="Products"></ListItemText>
                 </ListItemButton>
-              </NextLink>
-              <NextLink href="/admin/users" passHref>
-                <ListItemButton component="a">
+              </Link>
+              <Link component={NextLink} href="/admin/users">
+                <ListItemButton>
                   <ListItemText primary="Users"></ListItemText>
                 </ListItemButton>
-              </NextLink>
+              </Link>
             </List>
           </Card>
         </Grid>
@@ -169,9 +170,12 @@ function AdminOrders() {
                                 : "not delivered"}
                             </TableCell>
                             <TableCell>
-                              <NextLink href={`/order/${order._id}`} passHref>
+                              <Link
+                                component={NextLink}
+                                href={`/order/${order._id}`}
+                              >
                                 <Button variant="contained">Details</Button>
-                              </NextLink>
+                              </Link>
                             </TableCell>
                           </TableRow>
                         ))}

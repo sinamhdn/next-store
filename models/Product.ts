@@ -1,4 +1,6 @@
 import mongoose from 'mongoose';
+import slugify from 'slugify';
+import { v4 as uuidv4 } from 'uuid';
 
 interface IReview {
   user: mongoose.Types.ObjectId;
@@ -38,7 +40,7 @@ interface IProduct {
 const productSchema = new mongoose.Schema<IProduct>(
   {
     name: { type: String, required: true },
-    slug: { type: String, required: true, unique: true },
+    slug: { type: String, /*required: true,*/ unique: true },
     category: { type: String, required: true },
     image: { type: String, required: true },
     price: { type: Number, required: true },
@@ -55,6 +57,33 @@ const productSchema = new mongoose.Schema<IProduct>(
     timestamps: true,
   }
 );
+
+productSchema.pre("validate", function (next) {
+  if (this.isNew) {
+    this.slug = slugify(this.name, { lower: true }) + '-' + uuidv4();
+  }
+  next();
+});
+
+// productSchema.pre("insertMany", function (next, docs) {
+//   console.log('______________________oNew Itemo_________________________');
+//   for (let doc of docs) {
+//     if (doc.isNew) {
+//       console.log('______________________New Item_________________________');
+//       doc.slug = slugify(doc.name, { lower: true }) + '-' + uuidv4();
+//     }
+//   }
+//   next();
+// });
+
+// productSchema.pre("save", function (next) {
+//   console.log('----------------------oNew Itemo-----------------------');
+//   if (this.isNew) {
+//     console.log('----------------------New Item-----------------------');
+//     this.slug = slugify(this.name, { lower: true }) + '-' + uuidv4();
+//   }
+//   next();
+// });
 
 const Product =
   mongoose.models.Product || mongoose.model('Product', productSchema);

@@ -128,9 +128,12 @@ const Login: NextPage = () => {
           </ListItem>
           <ListItem>
             Don&apos;t have an account? &nbsp;
-            <NextLink href={`/register?redirect=${redirect || "/"}`} passHref>
-              <Link>Register</Link>
-            </NextLink>
+            <Link
+              component={NextLink}
+              href={`/register?redirect=${redirect || "/"}`}
+            >
+              Register
+            </Link>
           </ListItem>
         </List>
       </form>
