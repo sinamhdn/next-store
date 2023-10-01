@@ -8,7 +8,7 @@ import { red } from "@mui/material/colors";
 import { Store } from "./Store";
 
 export const inter = Inter({
-  weight: ["300", "400", "500", "700"],
+  weight: ["300", "400", "500", "700", "900"],
   subsets: ["latin"],
   display: "swap",
   fallback: ["Helvetica", "Arial", "sans-serif"],
@@ -23,7 +23,7 @@ export default function Theme({ children }: { children: ReactNode }) {
         palette: {
           mode: darkMode ? "dark" : "light",
           primary: {
-            main: "#FF5722",
+            main: "#0075cd",
           },
           secondary: {
             main: "#F44336",

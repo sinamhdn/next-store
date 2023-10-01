@@ -24,7 +24,7 @@ import { Store } from "../components/Store";
 import Layout from "../components/Layout";
 import ProductItem from "../components/ProductItem";
 
-const PAGE_SIZE = 3;
+const PAGE_SIZE = 9;
 
 const prices = [
   {

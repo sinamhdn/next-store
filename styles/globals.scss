@@ -15,10 +15,34 @@ a {
   box-sizing: border-box;
 }
 
+input:autofill,
+input:autofill:hover,
+input:autofill:focus,
+textarea:autofill,
+textarea:autofill:hover,
+textarea:autofill:focus,
+select:autofill,
+select:autofill:hover,
+select:autofill:focus,
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+textarea:-webkit-autofill,
+textarea:-webkit-autofill:hover,
+textarea:-webkit-autofill:focus,
+select:-webkit-autofill,
+select:-webkit-autofill:hover,
+select:-webkit-autofill:focus {
+  border: 1px solid #0075cd;
+  -webkit-text-fill-color: #0075cd;
+  -webkit-box-shadow: 0 0 0px 1000px rgba(255, 0, 0, 0) inset;
+  transition: background-color 5000s ease-in-out 0s;
+}
+
 .navbar {
-  background-color: #052f52;
+  // background-color: #052f52;
   a: {
-    color: #ffffff;
+    // color: #ffffff;
     margin-left: 10px;
   }
 }
@@ -53,7 +77,7 @@ a {
 }
 
 .navbar-button {
-  color: #ffffff;
+  // color: #ffffff;
   text-transform: initial;
 }
 
@@ -94,33 +118,53 @@ a {
 
 // search
 .search-section {
-  display: none;
+  border-radius: 5px;
+  overflow: hidden;
+  position: relative;
+  // display: none;
   @media (min-width: 900) {
     display: flex;
+  }
+
+  @media screen and (max-width: 540px) {
+    display: none;
+  }
+}
+
+.search-section-drawer {
+  width: 100%;
+  display: none;
+  @media screen and (max-width: 540px) {
+    display: block;
   }
 }
 
 .search-form {
-  border: 1px solid #ffffff;
-  background-color: #ffffff;
+  // border: 1px solid #ffffff;
+  // background-color: #ffffff;
   border-radius: 5;
 }
 
+.search-form-drawer {
+  display: flex;
+  justify-content: space-between;
+}
+
 .search-input {
-  padding-left: 5;
-  color: #000000;
-  &::placeholder {
-    color: #606060;
-  }
+  // padding-left: 5px;
+  // color: #000000;
+  // &::placeholder {
+  //   color: #606060;
+  // }
 }
 
 .icon-button {
-  background-color: #f8c040;
+  // background-color: #f8c040;
   padding: 5;
   border-radius: 0 5px 5px 0;
-  span {
-    color: #000000;
-  }
+  // span {
+  //   color: #000000;
+  // }
 }
 
 .sort {

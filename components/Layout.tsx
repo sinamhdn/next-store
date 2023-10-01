@@ -7,7 +7,7 @@ import {
   Typography,
   Container,
   Link,
-  Switch,
+  Checkbox,
   Badge,
   Button,
   Menu,
@@ -23,8 +23,10 @@ import {
   InputBase,
 } from "@mui/material";
 import MenuIcon from "@mui/icons-material/Menu";
-import CancelIcon from "@mui/icons-material/Cancel";
+import CloseRoundedIcon from "@mui/icons-material/CloseRounded";
 import SearchIcon from "@mui/icons-material/Search";
+import LightModeSharpIcon from "@mui/icons-material/LightModeSharp";
+import DarkModeSharpIcon from "@mui/icons-material/DarkModeSharp";
 import Cookies from "js-cookie";
 import { useState } from "react";
 import { useRouter } from "next/router";
@@ -33,7 +35,11 @@ import axios from "axios";
 import { useEffect } from "react";
 import { Inter } from "next/font/google";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBox, faCartShopping } from "@fortawesome/free-solid-svg-icons";
+import {
+  faBox,
+  faUser,
+  faCartShopping,
+} from "@fortawesome/free-solid-svg-icons";
 import { Store } from "../components/Store";
 import { getError } from "../utils/error";
 import type { ReactNode } from "react";
@@ -135,7 +141,11 @@ export default function Layout({
         {description && <meta name="description" content={description}></meta>}
       </Head>
 
-      <AppBar position="sticky" className="navbar">
+      <AppBar
+        position="sticky"
+        className="navbar"
+        sx={{ backgroundColor: "background.default" }}
+      >
         <Toolbar className="toolbar">
           <Box display="flex" alignItems="center">
             <IconButton
@@ -144,7 +154,18 @@ export default function Layout({
               onClick={sidebarOpenHandler}
               className="menu-button"
             >
-              <MenuIcon className="navbar-button" />
+              <MenuIcon
+                sx={{
+                  color: "primary.main",
+                  transition: "transform .2s",
+                  "&:hover": {
+                    // filter: "brightness(90%)",
+                    // color: "primary.main",
+                    transform: "scale(1.05)",
+                  },
+                }}
+                className="navbar-button"
+              />
             </IconButton>
             <Link
               sx={{
@@ -152,8 +173,12 @@ export default function Layout({
                 alignItems: "center",
                 padding: "0 1rem",
                 textDecoration: "none",
+                color: "primary.main",
+                transition: "transform .2s",
                 "&:hover": {
-                  filter: "brightness(80%)",
+                  // filter: "brightness(90%)",
+                  // color: "primary.main",
+                  transform: "scale(1.05)",
                 },
               }}
               component={NextLink}
@@ -182,9 +207,15 @@ export default function Layout({
                   alignItems="center"
                   justifyContent="space-between"
                 >
-                  <Typography>Shopping by category</Typography>
-                  <IconButton aria-label="close" onClick={sidebarCloseHandler}>
-                    <CancelIcon />
+                  <Typography sx={{ fontWeight: 900 }}>
+                    Product Categories
+                  </Typography>
+                  <IconButton
+                    aria-label="close"
+                    onClick={sidebarCloseHandler}
+                    sx={{ marginLeft: "50px" }}
+                  >
+                    <CloseRoundedIcon sx={{ color: "secondary.main" }} />
                   </IconButton>
                 </Box>
               </ListItem>
@@ -194,9 +225,16 @@ export default function Layout({
                   component={NextLink}
                   key={category}
                   href={`/search?category=${category}`}
+                  sx={{ textDecoration: "none" }}
                 >
                   <ListItemButton component="a" onClick={sidebarCloseHandler}>
-                    <ListItemText primary={category}></ListItemText>
+                    <ListItemText
+                      primary={category}
+                      sx={{
+                        color: "text.primary",
+                        "&:hover": { color: "primary.main" },
+                      }}
+                    ></ListItemText>
                   </ListItemButton>
                 </Link>
               ))}
@@ -210,31 +248,65 @@ export default function Layout({
                 className="search-input"
                 placeholder="Search products"
                 onChange={queryChangeHandler}
+                color="primary"
+                sx={{
+                  // backgroundColor: "action.hover",
+                  // color: "text.primary",
+                  "::placeholder": { color: "text.primary" },
+                  "&:focus": { backgroundColor: "unset" },
+                }}
               />
               <IconButton
                 type="submit"
                 className="icon-button"
                 aria-label="search"
+                sx={{
+                  color: "primary.main",
+                  "&:hover": {
+                    color: "text.primary",
+                    backgroundColor: "unset",
+                  },
+                }}
               >
                 <SearchIcon />
               </IconButton>
             </form>
           </div>
-          <div>
-            <Switch
+          <Box
+            sx={{
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+            }}
+          >
+            <Checkbox
+              icon={<LightModeSharpIcon sx={{ color: "#eeb200" }} />}
+              checkedIcon={<DarkModeSharpIcon sx={{ color: "#c0c0c0" }} />}
               checked={darkMode}
               onChange={darkModeChangeHandler}
               className="mode-checkbox"
-            ></Switch>
+              component="div"
+            ></Checkbox>
             <Link
               sx={{
                 textDecoration: "none",
-                "&:hover": { filter: "brightness(75%)" },
+                color: "primary.main",
+                transition: "transform .2s",
+                "&:hover": {
+                  // filter: "brightness(90%)",
+                  // color: "primary.main",
+                  transform: "scale(1.1)",
+                },
               }}
               component={NextLink}
               href="/cart"
             >
-              <Typography component="span">
+              <Typography
+                sx={{
+                  margin: "0 1rem",
+                }}
+                component="div"
+              >
                 {cart.cartItems.length > 0 ? (
                   <Badge color="secondary" badgeContent={cart.cartItems.length}>
                     <FontAwesomeIcon icon={faCartShopping} size="lg" />
@@ -262,20 +334,32 @@ export default function Layout({
                   onClose={loginMenuCloseHandler}
                 >
                   <MenuItem
-                    sx={{ hover: { filter: "brightness(80%)" } }}
+                    sx={{
+                      "&:hover": {
+                        color: "primary.main",
+                      },
+                    }}
                     onClick={(e) => loginMenuCloseHandler(e, "/profile")}
                   >
                     Profile
                   </MenuItem>
                   <MenuItem
-                    sx={{ hover: { filter: "brightness(80%)" } }}
+                    sx={{
+                      "&:hover": {
+                        color: "primary.main",
+                      },
+                    }}
                     onClick={(e) => loginMenuCloseHandler(e, "/order-history")}
                   >
                     Order Hisotry
                   </MenuItem>
                   {userInfo.isAdmin && (
                     <MenuItem
-                      sx={{ hover: { filter: "brightness(80%)" } }}
+                      sx={{
+                        "&:hover": {
+                          color: "primary.main",
+                        },
+                      }}
                       onClick={(e) =>
                         loginMenuCloseHandler(e, "/admin/dashboard")
                       }
@@ -284,7 +368,11 @@ export default function Layout({
                     </MenuItem>
                   )}
                   <MenuItem
-                    sx={{ hover: { filter: "brightness(80%)" } }}
+                    sx={{
+                      "&:hover": {
+                        color: "primary.main",
+                      },
+                    }}
                     onClick={logoutClickHandler}
                   >
                     Logout
@@ -293,15 +381,60 @@ export default function Layout({
               </>
             ) : (
               <Link
-                sx={{ hover: { filter: "brightness(80%)" } }}
+                sx={{
+                  color: "primary.main",
+                  transition: "transform .2s",
+                  "&:hover": {
+                    // filter: "brightness(90%)",
+                    // color: "primary.main",
+                    transform: "scale(1.1)",
+                  },
+                }}
                 component={NextLink}
                 href="/login"
               >
-                <Typography component="span">Login</Typography>
+                <Typography component="div">
+                  <FontAwesomeIcon icon={faUser} size="lg" />
+                </Typography>
               </Link>
             )}
-          </div>
+          </Box>
         </Toolbar>
+        <div className="search-section search-section-drawer">
+          <form
+            onSubmit={submitHandler}
+            className="search-form search-form-drawer"
+          >
+            <InputBase
+              name="query"
+              className="search-input"
+              placeholder="Search products"
+              onChange={queryChangeHandler}
+              color="primary"
+              sx={{
+                // backgroundColor: "action.hover",
+                // color: "text.primary",
+                paddingLeft: "15px",
+                "::placeholder": { color: "text.primary" },
+                "&:focus": { backgroundColor: "unset" },
+              }}
+            />
+            <IconButton
+              type="submit"
+              className="icon-button"
+              aria-label="search"
+              sx={{
+                color: "primary.main",
+                "&:hover": {
+                  color: "text.primary",
+                  backgroundColor: "unset",
+                },
+              }}
+            >
+              <SearchIcon />
+            </IconButton>
+          </form>
+        </div>
       </AppBar>
       <Container className="main">{children}</Container>
       <Container

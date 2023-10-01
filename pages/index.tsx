@@ -2,10 +2,10 @@
 import type { GetServerSideProps, NextPage } from "next";
 import NextLink from "next/link";
 import { useRouter } from "next/router";
-import { useContext } from "react";
+import { useContext, useState, useEffect } from "react";
 import Carousel from "react-material-ui-carousel";
 import axios from "axios";
-import { Grid, Link, Typography } from "@mui/material";
+import { Button, Grid, Link, Typography, Box } from "@mui/material";
 import NavigateNextIcon from "@mui/icons-material/NavigateNext";
 import NavigateBeforeIcon from "@mui/icons-material/NavigateBefore";
 import Product from "../models/Product";
@@ -13,12 +13,6 @@ import db from "../utils/db";
 import { Store } from "../components/Store";
 import Layout from "../components/Layout";
 import ProductItem from "../components/ProductItem";
-
-const styleCarousel = {
-  borderRadius: "20px",
-  marginTop: "5px",
-  // marginBottom: "5px",
-};
 
 interface TProduct {
   _id: string;
@@ -34,12 +28,25 @@ interface IProps {
   topRatedProducts: TProduct[];
   featuredProducts: TProduct[];
   newProducts: TProduct[];
+  productsCount: number;
 }
+
+const styleCarousel = {
+  borderRadius: "5px",
+  marginTop: "5px",
+  // marginBottom: "5px",
+};
+
+const initialPostsCount = 12;
+const incrementPostsCountBy = 12;
 
 const Home: NextPage<IProps> = (props) => {
   const router = useRouter();
   const { state, dispatch } = useContext(Store);
   const { topRatedProducts, featuredProducts, newProducts } = props;
+  const [displayProductCount, setDisplayProductCount] =
+    useState(initialPostsCount);
+  const [productsList, setProductsList] = useState(newProducts);
   const addToCartHandler = async (product: TProduct) => {
     const existItem = state.cart.cartItems.find((x) => x._id === product._id);
     const quantity = existItem ? existItem.quantity + 1 : 1;
@@ -49,7 +56,21 @@ const Home: NextPage<IProps> = (props) => {
       return;
     }
     dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
-    router.push("/cart");
+    // router.push("/cart");
+  };
+  // const refreshData = () => {
+  //   router.replace(router.asPath);
+  // };
+  // console.log("displayPosts+++++++++++++++++>", displayPosts);
+  // useEffect(() => {
+  //   router.push(`/?limit=${displayPosts}`);
+  // }, []);
+  const loadMore = (e: React.FormEvent) => {
+    // console.log("this runs");
+    // e.preventDefault();
+    // console.log("displayPosts------------->", displayProductCount);
+    // router.push(`/?limit=${displayPosts}`);
+    setDisplayProductCount(displayProductCount + incrementPostsCountBy);
   };
   return (
     <Layout>
@@ -121,8 +142,8 @@ const Home: NextPage<IProps> = (props) => {
         New Products
       </Typography>
       <Grid container spacing={3}>
-        {newProducts.map((product) => (
-          <Grid item md={4} key={product.name}>
+        {productsList.slice(0, displayProductCount).map((product) => (
+          <Grid item sm={6} md={3} key={product.name}>
             <ProductItem
               product={product}
               addToCartHandler={addToCartHandler}
@@ -130,6 +151,52 @@ const Home: NextPage<IProps> = (props) => {
           </Grid>
         ))}
       </Grid>
+      <Box
+        sx={{
+          // width: "100%",
+          marginTop: "1em",
+        }}
+        textAlign="center"
+      >
+        {displayProductCount < productsList.length ? (
+          <Button
+            sx={{
+              borderTopWidth: "1px",
+              borderBottomWidth: "1px",
+              borderStyle: "solid",
+              borderColor: "primary.main",
+              backgroundColor: "background.default",
+              color: "text.primary",
+              fontWeight: "700",
+              "&:hover": { backgroundColor: "primary.main", color: "#fdfdfd" },
+            }}
+            onClick={loadMore}
+          >
+            Load more
+          </Button>
+        ) : (
+          <Link
+            sx={{
+              backgroundColor: "primary.main",
+              color: "#fdfdfd",
+              fontWeight: "700",
+              borderRadius: "3px",
+              padding: "0.2em 1em",
+              "&:hover": {
+                color: "text.primary",
+                borderWidth: "1px",
+                borderStyle: "solid",
+                borderColor: "primary.main",
+                backgroundColor: "background.default",
+                textDecoration: "none",
+              },
+            }}
+            href={"/search"}
+          >
+            All products
+          </Link>
+        )}
+      </Box>
     </Layout>
   );
 };
@@ -137,11 +204,13 @@ const Home: NextPage<IProps> = (props) => {
 export default Home;
 
 export const getServerSideProps: GetServerSideProps = async () => {
+  // const limit = Number(ctx.query.limit);
+
   await db.connect();
 
   const featuredProductsDocs = await Product.find(
     { isFeatured: true },
-    "-numReviews"
+    "-reviews"
   )
     .lean()
     .sort({
@@ -149,19 +218,23 @@ export const getServerSideProps: GetServerSideProps = async () => {
     })
     .limit(3);
 
-  const topRatedProductsDocs = await Product.find({}, "-numReviews")
+  const topRatedProductsDocs = await Product.find({}, "-reviews")
     .lean()
     .sort({
       rating: -1,
     })
     .limit(6);
 
-  const newProductsDocs = await Product.find({}, "-createdAt")
+  const newProductsDocs = await Product.find({}, "-reviews")
     .lean()
     .sort({
-      rating: -1,
+      createdAt: -1,
     })
-    .limit(18);
+    .limit(36);
+
+  const productsCount = await Product.count();
+  // console.log("productsCount", productsCount);
+  // console.log("ctx.query.products", limit);
 
   await db.disconnect();
 
@@ -170,6 +243,7 @@ export const getServerSideProps: GetServerSideProps = async () => {
       featuredProducts: featuredProductsDocs.map(db.convertDocToObj),
       topRatedProducts: topRatedProductsDocs.map(db.convertDocToObj),
       newProducts: newProductsDocs.map(db.convertDocToObj),
+      productsCount,
     },
   };
 };

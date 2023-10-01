@@ -106,8 +106,8 @@ const ProductScreen: NextPage<Props> = (props) => {
   return (
     <Layout title={product.name} description={product.description}>
       <div className="section">
-        <Link component={NextLink} href="/" passHref>
-          <Typography>back to products</Typography>
+        <Link component={NextLink} href="/search" passHref>
+          <Typography>back to all products</Typography>
         </Link>
       </div>
       <Grid container spacing={1}>
@@ -118,6 +118,7 @@ const ProductScreen: NextPage<Props> = (props) => {
             width={640}
             height={640}
             sizes="100%"
+            style={{ width: "100%", height: "unset" }}
           ></Image>
         </Grid>
         <Grid item md={3} xs={12}>

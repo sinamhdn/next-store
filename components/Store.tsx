@@ -29,19 +29,15 @@ export const Store = React.createContext<ContextProps>({} as ContextProps);
 const initialState = {
   darkMode: Cookies.get("darkMode") === "ON" ? true : false,
   cart: {
-    cartItems: Cookies.get("cartItems")
-      ? JSON.parse(Cookies.get("cartItems") as string)
-      : [],
+    cartItems: Cookies.get("cartItems") ? Cookies.get("cartItems") : [],
     shippingAddress: Cookies.get("shippingAddress")
-      ? JSON.parse(Cookies.get("shippingAddress") as string)
+      ? Cookies.get("shippingAddress")
       : { location: {} },
     paymentMethod: Cookies.get("paymentMethod")
       ? Cookies.get("paymentMethod")
       : "",
   },
-  userInfo: Cookies.get("userInfo")
-    ? JSON.parse(Cookies.get("userInfo") as string)
-    : null,
+  userInfo: Cookies.get("userInfo") ? Cookies.get("userInfo") : null,
 };
 
 function reducer(state: TState, action: { type: string; payload?: any }) {
