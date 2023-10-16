@@ -93,6 +93,10 @@ select:-webkit-autofill:focus {
   width: 100%;
 }
 
+.full-width-form {
+  width: 100%;
+}
+
 .review-form {
   max-width: 800;
   width: 100%;
@@ -153,9 +157,11 @@ select:-webkit-autofill:focus {
 .search-input {
   // padding-left: 5px;
   // color: #000000;
-  // &::placeholder {
-  //   color: #606060;
-  // }
+  input {
+    &::placeholder {
+      color: #0075cd;
+    }
+  }
 }
 
 .icon-button {

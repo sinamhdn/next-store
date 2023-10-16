@@ -122,7 +122,7 @@ const Home: NextPage<IProps> = (props) => {
       </Typography>
       <Grid container spacing={3}>
         {topRatedProducts.map((product) => (
-          <Grid item md={2} sm={4} xs={6} key={product.name}>
+          <Grid item md={2} sm={4} xs={6} key={product._id}>
             <ProductItem
               product={product}
               addToCartHandler={addToCartHandler}
@@ -143,7 +143,7 @@ const Home: NextPage<IProps> = (props) => {
       </Typography>
       <Grid container spacing={3}>
         {productsList.slice(0, displayProductCount).map((product) => (
-          <Grid item sm={6} md={3} key={product.name}>
+          <Grid item sm={6} md={3} key={product._id}>
             <ProductItem
               product={product}
               addToCartHandler={addToCartHandler}

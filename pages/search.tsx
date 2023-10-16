@@ -16,6 +16,8 @@ import {
   Rating,
   Pagination,
 } from "@mui/material";
+import FormControl from "@mui/material/FormControl";
+import InputLabel from "@mui/material/InputLabel";
 import CancelIcon from "@mui/icons-material/Cancel";
 import type { SelectChangeEvent } from "@mui/material";
 import db from "../utils/db";
@@ -82,7 +84,7 @@ const Search: NextPage<ISearchProp> = (props) => {
     min?: number;
     max?: number;
     searchQuery?: string;
-    price?: number;
+    price?: string;
     rating?: number;
   };
 
@@ -104,7 +106,7 @@ const Search: NextPage<ISearchProp> = (props) => {
     if (sort) query.sort = sort;
     if (category) query.category = category;
     if (brand) query.brand = brand;
-    if (price) query.price = price.toString();
+    if (price) query.price = price;
     if (rating) query.rating = rating.toString();
     if (min) query.min ? query.min : Number(query.min) === 0 ? 0 : min;
     if (max) query.max ? query.max : Number(query.max) === 0 ? 0 : max;
@@ -134,7 +136,7 @@ const Search: NextPage<ISearchProp> = (props) => {
   };
 
   const priceHandler = (e: SelectChangeEvent<string>) => {
-    filterSearch({ price: Number(e.target.value) });
+    filterSearch({ price: e.target.value });
   };
 
   const ratingHandler = (e: SelectChangeEvent<string>) => {
@@ -150,87 +152,123 @@ const Search: NextPage<ISearchProp> = (props) => {
       return;
     }
     dispatch({ type: "CART_ADD_ITEM", payload: { ...product, quantity } });
-    router.push("/cart");
+    // router.push("/cart");
   };
 
   return (
     <Layout title="Search">
       <Grid className="mt1" container spacing={1}>
-        <Grid item md={3}>
+        <Grid item xs={12} md={3}>
           <List>
-            <ListItem>
+            <ListItem sx={{ textAlign: "center" }}>
               <Box className="full-width">
-                <Typography>Categories</Typography>
-                <Select
-                  fullWidth
-                  value={category as string}
-                  onChange={categoryHandler}
+                <FormControl
+                  variant="standard"
+                  className="full-width-form"
+                  sx={{ m: 1, minWidth: 120 }}
                 >
-                  <MenuItem value="all">All</MenuItem>
-                  {categories &&
-                    categories.map((category) => (
-                      <MenuItem key={category} value={category}>
-                        {category}
+                  <InputLabel id="category-select-standard-label">
+                    <Typography>Categories</Typography>
+                  </InputLabel>
+                  <Select
+                    fullWidth
+                    value={category as string}
+                    onChange={categoryHandler}
+                    className="search-page-select-box"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {categories &&
+                      categories.map((category) => (
+                        <MenuItem key={category} value={category}>
+                          {category}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </ListItem>
+            <ListItem sx={{ textAlign: "center" }}>
+              <Box className="full-width">
+                <FormControl
+                  variant="standard"
+                  className="full-width-form"
+                  sx={{ m: 1, minWidth: 120 }}
+                >
+                  <InputLabel id="category-select-standard-label">
+                    <Typography>Brands</Typography>
+                  </InputLabel>
+                  <Select
+                    value={brand as string}
+                    onChange={brandHandler}
+                    fullWidth
+                    className="search-page-select-box"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {brands &&
+                      brands.map((brand) => (
+                        <MenuItem key={brand} value={brand}>
+                          {brand}
+                        </MenuItem>
+                      ))}
+                  </Select>
+                </FormControl>
+              </Box>
+            </ListItem>
+            <ListItem sx={{ textAlign: "center" }}>
+              <Box className="full-width">
+                <FormControl
+                  variant="standard"
+                  className="full-width-form"
+                  sx={{ m: 1, minWidth: 120 }}
+                >
+                  <InputLabel id="category-select-standard-label">
+                    <Typography>Prices</Typography>
+                  </InputLabel>
+                  <Select
+                    value={price as string}
+                    onChange={priceHandler}
+                    fullWidth
+                    className="search-page-select-box"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {prices.map((price) => (
+                      <MenuItem key={price.value} value={price.value}>
+                        {price.name}
                       </MenuItem>
                     ))}
-                </Select>
+                  </Select>
+                </FormControl>
               </Box>
             </ListItem>
-            <ListItem>
+            <ListItem sx={{ textAlign: "center" }}>
               <Box className="full-width">
-                <Typography>Brands</Typography>
-                <Select
-                  value={brand as string}
-                  onChange={brandHandler}
-                  fullWidth
+                <FormControl
+                  variant="standard"
+                  className="full-width-form"
+                  sx={{ m: 1, minWidth: 120 }}
                 >
-                  <MenuItem value="all">All</MenuItem>
-                  {brands &&
-                    brands.map((brand) => (
-                      <MenuItem key={brand} value={brand}>
-                        {brand}
+                  <InputLabel id="category-select-standard-label">
+                    <Typography>Ratings</Typography>
+                  </InputLabel>
+                  <Select
+                    value={rating as string}
+                    onChange={ratingHandler}
+                    fullWidth
+                    className="search-page-select-box"
+                  >
+                    <MenuItem value="all">All</MenuItem>
+                    {ratings.map((rating) => (
+                      <MenuItem
+                        sx={{ dispaly: "flex" }}
+                        key={rating}
+                        value={rating}
+                      >
+                        <Rating value={rating} readOnly />
+                        <Typography component="span">&amp; Up</Typography>
                       </MenuItem>
                     ))}
-                </Select>
-              </Box>
-            </ListItem>
-            <ListItem>
-              <Box className="full-width">
-                <Typography>Prices</Typography>
-                <Select
-                  value={price as string}
-                  onChange={priceHandler}
-                  fullWidth
-                >
-                  <MenuItem value="all">All</MenuItem>
-                  {prices.map((price) => (
-                    <MenuItem key={price.value} value={price.value}>
-                      {price.name}
-                    </MenuItem>
-                  ))}
-                </Select>
-              </Box>
-            </ListItem>
-            <ListItem>
-              <Box className="full-width">
-                <Typography>Ratings</Typography>
-                <Select
-                  value={rating as string}
-                  onChange={ratingHandler}
-                  fullWidth
-                >
-                  <MenuItem value="all">All</MenuItem>
-                  {ratings.map((rating) => (
-                    <MenuItem
-                      sx={{ dispaly: "flex" }}
-                      key={rating}
-                      value={rating}
-                    >
-                      <Rating value={rating} readOnly />
-                      <Typography component="span">&amp; Up</Typography>
-                    </MenuItem>
-                  ))}
-                </Select>
+                  </Select>
+                </FormControl>
               </Box>
             </ListItem>
           </List>
@@ -255,21 +293,29 @@ const Search: NextPage<ISearchProp> = (props) => {
               ) : null}
             </Grid>
             <Grid item>
-              <Typography component="span" className="sort">
-                Sort by
-              </Typography>
-              <Select value={sort as string} onChange={sortHandler}>
-                <MenuItem value="featured">Featured</MenuItem>
-                <MenuItem value="lowest">Price: Low to High</MenuItem>
-                <MenuItem value="highest">Price: High to Low</MenuItem>
-                <MenuItem value="toprated">Customer Reviews</MenuItem>
-                <MenuItem value="newest">Newest Arrivals</MenuItem>
-              </Select>
+              <FormControl variant="standard" sx={{ m: 1, minWidth: 120 }}>
+                <InputLabel id="category-select-standard-label">
+                  <Typography component="span" className="sort">
+                    Sort by
+                  </Typography>
+                </InputLabel>
+                <Select
+                  value={sort as string}
+                  onChange={sortHandler}
+                  className="search-page-select-box"
+                >
+                  <MenuItem value="featured">Featured</MenuItem>
+                  <MenuItem value="lowest">Price: Low to High</MenuItem>
+                  <MenuItem value="highest">Price: High to Low</MenuItem>
+                  <MenuItem value="toprated">Customer Reviews</MenuItem>
+                  <MenuItem value="newest">Newest Arrivals</MenuItem>
+                </Select>
+              </FormControl>
             </Grid>
           </Grid>
           <Grid className="mt1" container spacing={3}>
             {products.map((product) => (
-              <Grid item md={4} key={product.name}>
+              <Grid item md={4} key={product._id}>
                 <ProductItem
                   product={product}
                   addToCartHandler={addToCartHandler}

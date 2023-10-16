@@ -18,6 +18,7 @@ import {
   TextField,
   CircularProgress,
 } from "@mui/material";
+import ArrowLeftIcon from "@mui/icons-material/ArrowLeft";
 import Product from "../../models/Product";
 import db from "../../utils/db";
 import { getError } from "../../utils/error";
@@ -106,7 +107,19 @@ const ProductScreen: NextPage<Props> = (props) => {
   return (
     <Layout title={product.name} description={product.description}>
       <div className="section">
-        <Link component={NextLink} href="/search" passHref>
+        <Link
+          component={NextLink}
+          href="/search"
+          passHref
+          sx={{
+            color: "text.primary",
+            textDecoration: "none",
+            display: "flex",
+            padding: "1em",
+            "&:hover": { color: "primary.main" },
+          }}
+        >
+          <ArrowLeftIcon />
           <Typography>back to all products</Typography>
         </Link>
       </div>

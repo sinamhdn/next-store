@@ -415,7 +415,7 @@ export default function Layout({
                 // backgroundColor: "action.hover",
                 // color: "text.primary",
                 paddingLeft: "15px",
-                "::placeholder": { color: "text.primary" },
+                // "::placeholder": { color: "text.primary" },
                 "&:focus": { backgroundColor: "unset" },
               }}
             />

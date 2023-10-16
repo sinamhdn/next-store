@@ -5,6 +5,7 @@ import { useRouter } from "next/router";
 import type { NextPage } from "next";
 import React, { useContext } from "react";
 import axios from "axios";
+import FormControl from "@mui/material/FormControl";
 import {
   Grid,
   TableContainer,
@@ -22,6 +23,7 @@ import {
   List,
   ListItem,
 } from "@mui/material";
+import CancelIcon from "@mui/icons-material/Cancel";
 import Layout from "../components/Layout";
 import { Store } from "../components/Store";
 
@@ -101,33 +103,37 @@ const CartScreen: NextPage = () => {
                         <Link
                           component={NextLink}
                           href={`/product/${item.slug}`}
+                          sx={{
+                            textDecoration: "none",
+                            "&:hover": { filter: "brightness(50%)" },
+                          }}
                         >
                           <Typography>{item.name}</Typography>
                         </Link>
                       </TableCell>
                       <TableCell align="right">
-                        <Select
-                          value={item.quantity}
-                          onChange={(e) =>
-                            updateCartHandler(item, e.target.value)
-                          }
-                        >
-                          {[...Array(item.countInStock).keys()].map((x) => (
-                            <MenuItem key={x + 1} value={x + 1}>
-                              {x + 1}
-                            </MenuItem>
-                          ))}
-                        </Select>
+                        <FormControl variant="standard" sx={{ m: 1 }}>
+                          <Select
+                            value={item.quantity}
+                            onChange={(e) =>
+                              updateCartHandler(item, e.target.value)
+                            }
+                          >
+                            {[...Array(item.countInStock).keys()].map((x) => (
+                              <MenuItem key={x + 1} value={x + 1}>
+                                {x + 1}
+                              </MenuItem>
+                            ))}
+                          </Select>
+                        </FormControl>
                       </TableCell>
                       <TableCell align="right">{item.price}</TableCell>
                       <TableCell align="right">
-                        <Button
-                          variant="contained"
+                        <CancelIcon
                           color="secondary"
                           onClick={() => removeItemHandler(item)}
-                        >
-                          x
-                        </Button>
+                          sx={{ "&:hover": { cursor: "pointer" } }}
+                        />
                       </TableCell>
                     </TableRow>
                   ))}
